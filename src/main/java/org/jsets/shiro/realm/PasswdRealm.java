@@ -41,6 +41,7 @@ public class PasswdRealm extends AuthorizingRealm {
 	private MessageConfig messages;
 	private ShiroAccountProvider accountProvider;
 	
+	@Override
 	public Class<?> getAuthenticationTokenClass() {
 		return UsernamePasswordToken.class;
 	}
@@ -71,10 +72,12 @@ public class PasswdRealm extends AuthorizingRealm {
 		SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
 		Set<String> roles = this.accountProvider.loadRoles(account);
 		Set<String> permissions = this.accountProvider.loadPermissions(account);
-		if(null!=roles&&!roles.isEmpty())
-			info.setRoles(roles);
-		if(null!=permissions&&!permissions.isEmpty())
-			info.setStringPermissions(permissions);
+		if(null!=roles&&!roles.isEmpty()) {
+            info.setRoles(roles);
+        }
+		if(null!=permissions&&!permissions.isEmpty()) {
+            info.setStringPermissions(permissions);
+        }
         return info;  
 	}
 

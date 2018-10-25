@@ -34,6 +34,7 @@ import org.apache.shiro.util.CollectionUtils;
  */
 public class JsetsModularRealmAuthenticator extends ModularRealmAuthenticator {
 
+	@Override
 	protected AuthenticationInfo doAuthenticate(AuthenticationToken authenticationToken) throws AuthenticationException {
 		assertRealmsConfigured();
 		List<Realm> realms = this.getRealms()
@@ -42,8 +43,9 @@ public class JsetsModularRealmAuthenticator extends ModularRealmAuthenticator {
 					return realm.supports(authenticationToken);
 			})
 			.collect(toList());
-		if (CollectionUtils.isEmpty(realms)) 
-			throw new IllegalStateException("Configuration error:  No realms support token type:" + authenticationToken.getClass());
+		if (CollectionUtils.isEmpty(realms)) {
+            throw new IllegalStateException("Configuration error:  No realms support token type:" + authenticationToken.getClass());
+        }
 		
 		if (realms.size() == 1) {
 			return doSingleRealmAuthentication(realms.iterator().next(), authenticationToken);

@@ -41,7 +41,8 @@ public class JsetsSubjectFactory extends DefaultWebSubjectFactory {
 		this.storageEvaluator = storageEvaluator;
 	}
 	
-    public Subject createSubject(SubjectContext context) { 
+    @Override
+    public Subject createSubject(SubjectContext context) {
     	this.storageEvaluator.setSessionStorageEnabled(Boolean.TRUE);
     	AuthenticationToken token = context.getAuthenticationToken();
     	if(Commons.isStatelessToken(token)){

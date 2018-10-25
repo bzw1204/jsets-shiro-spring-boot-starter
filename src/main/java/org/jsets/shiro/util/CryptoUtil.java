@@ -66,7 +66,9 @@ public abstract class CryptoUtil {
 		// 用户名
 		jwt.setSubject(subject);
 		// 签发者
-		if(null!=issuer&&!"".equals(issuer)) jwt.setIssuer(issuer);
+		if(null!=issuer&&!"".equals(issuer)) {
+            jwt.setIssuer(issuer);
+        }
 		// 签发时间
 		jwt.setIssuedAt(new Date(currentTimeMillis));
 		// 有效时间
@@ -75,9 +77,13 @@ public abstract class CryptoUtil {
 			jwt.setExpiration(expiration);
 		}
 		// 访问主张-角色
-		if(null!=roles&&!"".equals(roles)) jwt.claim("roles", roles);
+		if(null!=roles&&!"".equals(roles)) {
+            jwt.claim("roles", roles);
+        }
 		// 访问主张-权限
-		if(null!=permissions&&!"".equals(permissions)) jwt.claim("perms", permissions);
+		if(null!=permissions&&!"".equals(permissions)) {
+            jwt.claim("perms", permissions);
+        }
 		jwt.compressWith(CompressionCodecs.DEFLATE);
 		jwt.signWith(algorithm, secretKeyBytes);
 		return jwt.compact();
@@ -116,8 +122,9 @@ public abstract class CryptoUtil {
 	    String stmp;
 	    for (int n = 0; bytes!=null && n < bytes.length; n++) {
 	        stmp = Integer.toHexString(bytes[n] & 0XFF);
-	        if (stmp.length() == 1)
-	            hs.append('0');
+	        if (stmp.length() == 1) {
+                hs.append('0');
+            }
 	        hs.append(stmp);
 	    }
 	    return hs.toString().toUpperCase();

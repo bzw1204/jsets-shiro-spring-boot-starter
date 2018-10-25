@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ package org.jsets.shiro.config;
 
 /**
  * 配置异常
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
- *
  */
-public class IllegalConfigException extends RuntimeException{
+public class IllegalConfigException extends RuntimeException {
 
-	private static final long serialVersionUID = -3380352624906053051L;
+    private static final long serialVersionUID = -3380352624906053051L;
 
-	public IllegalConfigException() {
+    public IllegalConfigException() {
         super();
     }
 

@@ -35,7 +35,9 @@ public class DefaultStatelessAccountProvider implements ShiroStatelessAccountPro
 	@Override
 	public boolean checkAccount(String appId) throws AuthenticationException {
 		Account account = shiroAccountProvider.loadAccount(appId);
-		if(null == account) return false;
+		if(null == account) {
+            return false;
+        }
 		return true;
 	}
 	

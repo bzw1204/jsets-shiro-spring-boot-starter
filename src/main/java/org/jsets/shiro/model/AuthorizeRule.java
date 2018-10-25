@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +20,37 @@ package org.jsets.shiro.model;
 import java.io.Serializable;
 
 /**
- * 
  * 权限验证规则
- * @author wangjie 
- * @date 2016年6月31日
  *
+ * @author wangjie
+ * @date 2016年6月31日
  */
-public abstract class AuthorizeRule implements Serializable{
+public abstract class AuthorizeRule implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	public static final short RULE_TYPE_DEF = 1;
-	public static final short RULE_TYPE_HMAC = 2;
-	public static final short RULE_TYPE_JWT = 3;
-	public static final short RULE_TYPE_CUSTOM = 4;
-	
-	private short type;// 规则类型
+    private static final long serialVersionUID = 1L;
 
-	public short getType() {
-		return type;
-	}
-	public void setType(short type) {
-		this.type = type;
-	}
+    public static final short RULE_TYPE_DEF = 1;
+    public static final short RULE_TYPE_HMAC = 2;
+    public static final short RULE_TYPE_JWT = 3;
+    public static final short RULE_TYPE_CUSTOM = 4;
 
-	public abstract StringBuilder toFilterChain();
+    /**
+     * 规则类型
+     */
+    private short type;
+
+    public short getType() {
+        return type;
+    }
+
+    public void setType(short type) {
+        this.type = type;
+    }
+
+    /**
+     * 转过滤器链
+     *
+     * @return
+     */
+    public abstract StringBuilder toFilterChain();
 }

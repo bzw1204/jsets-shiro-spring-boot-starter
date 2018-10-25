@@ -57,7 +57,9 @@ public class RolePermRule extends AuthorizeRule  {
 	@Override
 	public StringBuilder toFilterChain() {
 		
-		if(Strings.isNullOrEmpty(this.getUrl())) return null;
+		if(Strings.isNullOrEmpty(this.getUrl())) {
+            return null;
+        }
 		
 		StringBuilder sb = new StringBuilder();
 		if(AuthorizeRule.RULE_TYPE_DEF == this.getType()){
@@ -65,7 +67,9 @@ public class RolePermRule extends AuthorizeRule  {
         		sb.append(Commons.FILTER_ROLES+"["+this.getNeedRoles()+"]");
         	}
         	if(!Strings.isNullOrEmpty(this.getNeedPerms())){
-        		if(sb.length()>0) sb.append(",");
+        		if(sb.length()>0) {
+                    sb.append(",");
+                }
         		sb.append(Commons.FILTER_PERMS+"["+this.getNeedPerms()+"]");
         	}
 		}
@@ -74,7 +78,9 @@ public class RolePermRule extends AuthorizeRule  {
         		sb.append(Commons.FILTER_HMAC_ROLES+"["+this.getNeedRoles()+"]");
         	}
         	if(!Strings.isNullOrEmpty(this.getNeedPerms())){
-        		if(sb.length()>0) sb.append(",");
+        		if(sb.length()>0) {
+                    sb.append(",");
+                }
         		sb.append(Commons.FILTER_HMAC_PERMS+"["+this.getNeedPerms()+"]");
         	}
         	if(sb.length()==0) {
@@ -86,7 +92,9 @@ public class RolePermRule extends AuthorizeRule  {
         		sb.append(Commons.FILTER_JWT_ROLES+"["+this.getNeedRoles()+"]");
         	}
         	if(!Strings.isNullOrEmpty(this.getNeedPerms())){
-        		if(sb.length()>0) sb.append(",");
+        		if(sb.length()>0) {
+                    sb.append(",");
+                }
         		sb.append(Commons.FILTER_JWT_ROLES+"["+this.getNeedPerms()+"]");
         	}
         	if(sb.length()==0) {

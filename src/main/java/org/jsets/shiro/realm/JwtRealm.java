@@ -41,6 +41,7 @@ public class JwtRealm extends AuthorizingRealm{
 
 	private MessageConfig messages;
 	
+	@Override
 	public Class<?> getAuthenticationTokenClass() {
 		return JwtToken.class;
 	}
@@ -51,7 +52,9 @@ public class JwtRealm extends AuthorizingRealm{
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		// 只认证JwtToken
-		if(!(token instanceof JwtToken)) return null;
+		if(!(token instanceof JwtToken)) {
+            return null;
+        }
 		String jwt = ((JwtToken)token).getJwt();
 		String payload = null;
 		try{
@@ -84,10 +87,12 @@ public class JwtRealm extends AuthorizingRealm{
     		Set<String> roles = Commons.split((String)payloadMap.get("roles"));
     		Set<String> permissions = Commons.split((String)payloadMap.get("perms"));
     		SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
-    		if(null!=roles&&!roles.isEmpty())
-    			info.setRoles(roles);
-    		if(null!=permissions&&!permissions.isEmpty())
-    			info.setStringPermissions(permissions);
+    		if(null!=roles&&!roles.isEmpty()) {
+                info.setRoles(roles);
+            }
+    		if(null!=permissions&&!permissions.isEmpty()) {
+                info.setStringPermissions(permissions);
+            }
     		 return info;
         }
         return null;

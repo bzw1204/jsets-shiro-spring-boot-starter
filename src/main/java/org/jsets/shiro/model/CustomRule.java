@@ -48,8 +48,12 @@ public class CustomRule extends AuthorizeRule{
 
 	@Override
 	public StringBuilder toFilterChain() {
-		if(Strings.isNullOrEmpty(this.getUrl())) return null;
-		if(Strings.isNullOrEmpty(this.getRule())) return null;
+		if(Strings.isNullOrEmpty(this.getUrl())) {
+            return null;
+        }
+		if(Strings.isNullOrEmpty(this.getRule())) {
+            return null;
+        }
 		return new StringBuilder(this.getRule());
 	}
 	

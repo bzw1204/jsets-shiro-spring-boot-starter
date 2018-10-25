@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
@@ -37,70 +38,68 @@ import com.google.common.collect.Lists;
 
 /**
  * 无状态过滤器--抽象父类
- * 
- * @author wangjie (http://www.jianshu.com/u/ffa3cba4c604) 
+ *
+ * @author wangjie (http://www.jianshu.com/u/ffa3cba4c604)
  * @date 2016年6月24日 下午2:55:15
  */
-public abstract class StatelessFilter extends AccessControlFilter{
+public abstract class StatelessFilter extends AccessControlFilter {
 
-	protected boolean isHmacSubmission(ServletRequest request) {
+    protected boolean isHmacSubmission(ServletRequest request) {
 
-		String appId = request.getParameter(ShiroProperties.PARAM_HMAC_APP_ID);
-		String timestamp = request.getParameter(ShiroProperties.PARAM_HMAC_TIMESTAMP);
-		String digest= request.getParameter(ShiroProperties.PARAM_HMAC_DIGEST);
-		return (request instanceof HttpServletRequest)
-							&& !Strings.isNullOrEmpty(appId)
-							&& !Strings.isNullOrEmpty(timestamp)
-							&& !Strings.isNullOrEmpty(digest);
-	}
-	
-	protected AuthenticationToken createHmacToken(ServletRequest request, ServletResponse response) {
-		
-		String appId = request.getParameter(ShiroProperties.PARAM_HMAC_APP_ID);
-		String timestamp = request.getParameter(ShiroProperties.PARAM_HMAC_TIMESTAMP);
-		String digest= request.getParameter(ShiroProperties.PARAM_HMAC_DIGEST);
-		List<String> parameterNames = Lists.newLinkedList();
-		Enumeration<String> namesEnumeration = request.getParameterNames();
-		while(namesEnumeration.hasMoreElements()){
+        String appId = request.getParameter(ShiroProperties.PARAM_HMAC_APP_ID);
+        String timestamp = request.getParameter(ShiroProperties.PARAM_HMAC_TIMESTAMP);
+        String digest = request.getParameter(ShiroProperties.PARAM_HMAC_DIGEST);
+        return (request instanceof HttpServletRequest)
+                && !Strings.isNullOrEmpty(appId)
+                && !Strings.isNullOrEmpty(timestamp)
+                && !Strings.isNullOrEmpty(digest);
+    }
+
+    protected AuthenticationToken createHmacToken(ServletRequest request, ServletResponse response) {
+
+        String appId = request.getParameter(ShiroProperties.PARAM_HMAC_APP_ID);
+        String timestamp = request.getParameter(ShiroProperties.PARAM_HMAC_TIMESTAMP);
+        String digest = request.getParameter(ShiroProperties.PARAM_HMAC_DIGEST);
+        List<String> parameterNames = Lists.newLinkedList();
+        Enumeration<String> namesEnumeration = request.getParameterNames();
+        while (namesEnumeration.hasMoreElements()) {
             String parameterName = namesEnumeration.nextElement();
             parameterNames.add(parameterName);
         }
-		StringBuilder baseString = new StringBuilder();
-		parameterNames.stream()
-			.sorted()
-			.forEach(name -> {
-				if(!ShiroProperties.PARAM_HMAC_APP_ID.equals(name)
-					&&!ShiroProperties.PARAM_HMAC_TIMESTAMP.equals(name)
-					&&!ShiroProperties.PARAM_HMAC_DIGEST.equals(name))
-					baseString.append(request.getParameter(name));
-		});
-		baseString.append(appId);
-		baseString.append(timestamp);
-		String host = request.getRemoteHost();
-		return new HmacToken( host, appId, timestamp, baseString.toString(), digest);
-	}
-	
-	protected boolean isJwtSubmission(ServletRequest request) {
-		String jwt = request.getParameter(ShiroProperties.PARAM_JWT);
-		return (request instanceof HttpServletRequest) && !Strings.isNullOrEmpty(jwt);
-	}
-	
-	protected AuthenticationToken createJwtToken(ServletRequest request, ServletResponse response) {
-		String host = request.getRemoteHost();
-		String jwt = request.getParameter(ShiroProperties.PARAM_JWT);
-		return new JwtToken(host,jwt);
-	}
-	
-	protected boolean checkRoles(Subject subject, Object mappedValue){
+        StringBuilder baseString = new StringBuilder();
+        parameterNames.stream().sorted().forEach(name -> {
+            if (!ShiroProperties.PARAM_HMAC_APP_ID.equals(name)
+                    && !ShiroProperties.PARAM_HMAC_TIMESTAMP.equals(name)
+                    && !ShiroProperties.PARAM_HMAC_DIGEST.equals(name)) {
+                baseString.append(request.getParameter(name));
+            }
+        });
+        baseString.append(appId);
+        baseString.append(timestamp);
+        String host = request.getRemoteHost();
+        return new HmacToken(host, appId, timestamp, baseString.toString(), digest);
+    }
+
+    protected boolean isJwtSubmission(ServletRequest request) {
+        String jwt = request.getParameter(ShiroProperties.PARAM_JWT);
+        return (request instanceof HttpServletRequest) && !Strings.isNullOrEmpty(jwt);
+    }
+
+    protected AuthenticationToken createJwtToken(ServletRequest request, ServletResponse response) {
+        String host = request.getRemoteHost();
+        String jwt = request.getParameter(ShiroProperties.PARAM_JWT);
+        return new JwtToken(host, jwt);
+    }
+
+    protected boolean checkRoles(Subject subject, Object mappedValue) {
         String[] rolesArray = (String[]) mappedValue;
         if (rolesArray == null || rolesArray.length == 0) {
             return true;
         }
-        return Stream.of(rolesArray)
-        			.anyMatch(role->subject.hasRole(role));
-	}
-	
-	protected boolean checkPerms(Subject subject, Object mappedValue){
+        return Stream.of(rolesArray).anyMatch(role -> subject.hasRole(role));
+    }
+
+    protected boolean checkPerms(Subject subject, Object mappedValue) {
         String[] perms = (String[]) mappedValue;
         boolean isPermitted = true;
         if (perms != null && perms.length > 0) {
@@ -115,23 +114,23 @@ public abstract class StatelessFilter extends AccessControlFilter{
             }
         }
         return isPermitted;
-	}
-	
-	@Override
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+    }
+
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         Subject subject = getSubject(request, response);
         //未认证
         if (null == subject || !subject.isAuthenticated()) {
-        	Commons.restFailed(WebUtils.toHttp(response)
-        								,MessageConfig.REST_CODE_AUTH_UNAUTHORIZED
-        								,MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
-        //未授权
+            Commons.restFailed(WebUtils.toHttp(response)
+                    , MessageConfig.REST_CODE_AUTH_UNAUTHORIZED
+                    , MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
+            //未授权
         } else {
-    		Commons.restFailed(WebUtils.toHttp(response)
-										,MessageConfig.REST_CODE_AUTH_FORBIDDEN
-										,MessageConfig.REST_MESSAGE_AUTH_FORBIDDEN);
-        }	
+            Commons.restFailed(WebUtils.toHttp(response)
+                    , MessageConfig.REST_CODE_AUTH_FORBIDDEN
+                    , MessageConfig.REST_MESSAGE_AUTH_FORBIDDEN);
+        }
         return false;
-	}
-	
+    }
+
 }

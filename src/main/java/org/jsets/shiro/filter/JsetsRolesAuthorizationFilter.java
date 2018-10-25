@@ -35,6 +35,7 @@ import com.google.common.collect.Lists;
  */
 public class JsetsRolesAuthorizationFilter extends JsetsAuthorizationFilter{
 
+    @Override
     public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
     	Subject subject = getSubject(request, response);
         String[] rolesArray = (String[]) mappedValue;
@@ -44,7 +45,9 @@ public class JsetsRolesAuthorizationFilter extends JsetsAuthorizationFilter{
         List<String> roles = CollectionUtils.asList(rolesArray);
         boolean[] hasRoles = subject.hasRoles(roles);
         for(boolean hasRole:hasRoles){
-        	if(hasRole) return true;
+        	if(hasRole) {
+                return true;
+            }
         }
         return false;
     }

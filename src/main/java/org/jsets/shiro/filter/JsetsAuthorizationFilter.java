@@ -35,6 +35,7 @@ import org.jsets.shiro.util.Commons;
  */
 public abstract class JsetsAuthorizationFilter extends AuthorizationFilter{
 
+    @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws IOException {
         Subject subject = getSubject(request, response);
         //未认证

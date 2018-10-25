@@ -90,7 +90,8 @@ public class RedisCacheManager implements CacheManager{
 			return this.redisTemplate.keys(cacheName);
 		}
 
-		public V put(K key, V value) throws CacheException {
+		@Override
+        public V put(K key, V value) throws CacheException {
 			this.redisTemplate.put(cacheName, key, value);
 			return this.redisTemplate.get(cacheName, key);
 		}

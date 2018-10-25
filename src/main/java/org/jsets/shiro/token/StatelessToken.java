@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,26 +21,29 @@ import org.apache.shiro.authc.AuthenticationToken;
 
 /**
  * 无状态令牌抽象
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public abstract class StatelessToken implements AuthenticationToken{
+public abstract class StatelessToken implements AuthenticationToken {
 
-	private static final long serialVersionUID = 6655946030026745372L;
+    private static final long serialVersionUID = 6655946030026745372L;
 
-	private String host;// 客户IP
-	
-	public StatelessToken(String host){
-		this.host = host;
-	}
-	
-	public String getHost() {
-		return host;
-	}
+    /**
+     * 客户IP
+     */
+    private String host;
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+    public StatelessToken(String host) {
+        this.host = host;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
 
 }

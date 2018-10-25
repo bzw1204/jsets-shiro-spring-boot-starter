@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,22 @@ import java.io.Serializable;
 
 /**
  * 账号的抽象，应用中的用户实体要实现这个接口
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
- */ 
-public interface Account extends Serializable{
-	/**
-	 * 获取用户名
-	 */
-	public String getAccount();
-	/**
-	 * 获取登陆口令
-	 */
-	public String getPassword();
+ */
+public interface Account extends Serializable {
+    /**
+     * 获取用户名
+     *
+     * @return
+     */
+    String getAccount();
+
+    /**
+     * 获取登陆口令
+     *
+     * @return
+     */
+    String getPassword();
 }

@@ -136,16 +136,20 @@ public class FilterManager {
 		// ------------anon
 		ShiroProperties.DEFAULT_IGNORED.forEach(ignored 
 								-> this.anonFilterChain.put(ignored, Commons.FILTER_ANON));
-		if(Commons.hasLen(this.properties.getKickoutUrl()))
-			this.anonFilterChain.put(properties.getKickoutUrl(), Commons.FILTER_ANON);
-		if(Commons.hasLen(properties.getForceLogoutUrl()))
-			this.anonFilterChain.put(properties.getForceLogoutUrl(), Commons.FILTER_ANON);
+		if(Commons.hasLen(this.properties.getKickoutUrl())) {
+            this.anonFilterChain.put(properties.getKickoutUrl(), Commons.FILTER_ANON);
+        }
+		if(Commons.hasLen(properties.getForceLogoutUrl())) {
+            this.anonFilterChain.put(properties.getForceLogoutUrl(), Commons.FILTER_ANON);
+        }
 		// ------------static
-		if (this.properties.isJcaptchaEnable())
-			this.staticFilterChain.put(Commons.JCAPTCHA_URL, Commons.FILTER_JCAPTCHA);
+		if (this.properties.isJcaptchaEnable()) {
+            this.staticFilterChain.put(Commons.JCAPTCHA_URL, Commons.FILTER_JCAPTCHA);
+        }
 		this.properties.getFilteRules().forEach(rule->{
-			if(rule.split("-->").length!=2) 
-				throw new IllegalConfigException("过滤规则配置不正确,格式：url->filters");
+			if(rule.split("-->").length!=2) {
+                throw new IllegalConfigException("过滤规则配置不正确,格式：url->filters");
+            }
 			Stream.of(rule.split("-->")[0].split(","))
 					.forEach(url->this.staticFilterChain.put(url, rule.split("-->")[1]));
 		});
@@ -173,54 +177,64 @@ public class FilterManager {
 	}
 	
 	private void buildDynamicFilterChain(){
-		if(null == this.rulesProvider) return;
+		if(null == this.rulesProvider) {
+            return;
+        }
 		List<RolePermRule> rolePermRules = this.rulesProvider.loadRolePermRules();
-		if(null != rolePermRules)
-			rolePermRules.forEach(rule -> {
-				rule.setType(AuthorizeRule.RULE_TYPE_DEF);
-				StringBuilder filterChain = rule.toFilterChain();
-				if(null != filterChain){
-					this.attachFilters(filterChain);
-					this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
-				}
-			}); 
+		if(null != rolePermRules) {
+            rolePermRules.forEach(rule -> {
+                rule.setType(AuthorizeRule.RULE_TYPE_DEF);
+                StringBuilder filterChain = rule.toFilterChain();
+                if(null != filterChain){
+                    this.attachFilters(filterChain);
+                    this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
+                }
+            });
+        }
 		
 		List<RolePermRule> hmacRules = this.rulesProvider.loadHmacRules();
-		if(null != hmacRules)
-			hmacRules.forEach(rule -> {
-				rule.setType(AuthorizeRule.RULE_TYPE_HMAC);
-				StringBuilder filterChain = rule.toFilterChain();
-				if(null != filterChain)
-					this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
-			}); 
+		if(null != hmacRules) {
+            hmacRules.forEach(rule -> {
+                rule.setType(AuthorizeRule.RULE_TYPE_HMAC);
+                StringBuilder filterChain = rule.toFilterChain();
+                if(null != filterChain) {
+                    this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
+                }
+            });
+        }
 
 		List<RolePermRule> jwtRules = this.rulesProvider.loadJwtRules();
-		if(null != jwtRules)
-			jwtRules.forEach(rule -> {
-				rule.setType(AuthorizeRule.RULE_TYPE_JWT);
-				StringBuilder filterChain = rule.toFilterChain();
-				if(null != filterChain)
-					this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
-			}); 
+		if(null != jwtRules) {
+            jwtRules.forEach(rule -> {
+                rule.setType(AuthorizeRule.RULE_TYPE_JWT);
+                StringBuilder filterChain = rule.toFilterChain();
+                if(null != filterChain) {
+                    this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
+                }
+            });
+        }
 		
 		List<CustomRule> customRules = this.rulesProvider.loadCustomRules();
-		if(null != customRules)
-			customRules.forEach(rule -> {
-				rule.setType(AuthorizeRule.RULE_TYPE_CUSTOM);
-				StringBuilder filterChain = rule.toFilterChain();
-				if(null != filterChain){
-					this.attachFilters(filterChain);
-					this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
-				}
-			});
+		if(null != customRules) {
+            customRules.forEach(rule -> {
+                rule.setType(AuthorizeRule.RULE_TYPE_CUSTOM);
+                StringBuilder filterChain = rule.toFilterChain();
+                if(null != filterChain){
+                    this.attachFilters(filterChain);
+                    this.dynamicFilterChain.putIfAbsent(rule.getUrl(), filterChain.toString());
+                }
+            });
+        }
 	}
 	
 	private void attachFilters(StringBuilder filterChain){
 		filterChain.append(","+Commons.FILTER_USER);
-		if (this.properties.isKeepOneEnabled()) 
-			filterChain.append(","+Commons.FILTER_KEEP_ONE);
-		if (this.properties.isForceLogoutEnable()) 
-			filterChain.append(","+Commons.FILTER_FORCE_LOGOUT);
+		if (this.properties.isKeepOneEnabled()) {
+            filterChain.append(","+Commons.FILTER_KEEP_ONE);
+        }
+		if (this.properties.isForceLogoutEnable()) {
+            filterChain.append(","+Commons.FILTER_FORCE_LOGOUT);
+        }
 	}
 	
 	public Map<String, Filter> getAllFilters() {

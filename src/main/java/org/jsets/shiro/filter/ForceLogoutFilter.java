@@ -43,7 +43,8 @@ public class ForceLogoutFilter extends JsetsAccessControlFilter {
 		return false;
 	}
 
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+	@Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 		Subject subject = getSubject(request, response);
 		if (!subject.isAuthenticated() && !subject.isRemembered()) {
 			return this.respondLogin(request, response);

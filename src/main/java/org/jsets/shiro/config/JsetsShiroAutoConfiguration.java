@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ import org.springframework.cache.annotation.AbstractCachingConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
 /**
  * shiro自动配置
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
@@ -41,34 +42,34 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureAfter(AbstractCachingConfiguration.class)
 public class JsetsShiroAutoConfiguration {
 
-	@Autowired
-	private BeanFactory beanFactory;
-	@Autowired
-	private ShiroProperties properties;
+    @Autowired
+    private BeanFactory beanFactory;
+    @Autowired
+    private ShiroProperties properties;
 
-	@Bean
-	public BeanPostProcessor lifecycleBeanPostProcessor() {
-		return new LifecycleBeanPostProcessor();
-	}
-	
-	@Bean
-	public ShiroCryptoService shiroCryptoService() {
-		return new ShiroCryptoService();
-	}
-	
-	@Bean
-	public JsetsShiroManager jsetsShiroManager(ShiroCryptoService shiroCryptoService) {
-		JsetsShiroManager shiroManager = new JsetsShiroManager(
-										 this.beanFactory
-										,this.properties
-										,new SecurityManagerConfig()
-										,new FilterChainConfig());
-		shiroManager.setCryptoService(shiroCryptoService);
-		return shiroManager;
-	}
-	
-	@Bean
-	public ShiroSecurityService shiroSecurityService() {
-		return new ShiroSecurityService();
-	}
+    @Bean
+    public BeanPostProcessor lifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
+    }
+
+    @Bean
+    public ShiroCryptoService shiroCryptoService() {
+        return new ShiroCryptoService();
+    }
+
+    @Bean
+    public JsetsShiroManager jsetsShiroManager(ShiroCryptoService shiroCryptoService) {
+        JsetsShiroManager shiroManager = new JsetsShiroManager(
+                this.beanFactory
+                , this.properties
+                , new SecurityManagerConfig()
+                , new FilterChainConfig());
+        shiroManager.setCryptoService(shiroCryptoService);
+        return shiroManager;
+    }
+
+    @Bean
+    public ShiroSecurityService shiroSecurityService() {
+        return new ShiroSecurityService();
+    }
 }

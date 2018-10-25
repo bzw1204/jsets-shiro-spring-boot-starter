@@ -58,8 +58,9 @@ public class JsetsJwtMatcher implements CredentialsMatcher {
 			} else {
 				String appId = (String) Commons.readValue(Commons.parseJwtPayload(jwt)).get("subject");
 				String appKey = accountProvider.loadAppKey(appId);
-				if(Strings.isNullOrEmpty(appKey)) 
-					throw new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY);
+				if(Strings.isNullOrEmpty(appKey)) {
+                    throw new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY);
+                }
 				statelessAccount = this.cryptoService.parseJwt(jwt,appKey);
 			}
 			

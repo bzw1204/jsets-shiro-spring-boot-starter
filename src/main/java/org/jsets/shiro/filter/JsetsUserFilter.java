@@ -38,7 +38,8 @@ public class JsetsUserFilter extends JsetsAccessControlFilter {
 
 	private ShiroAccountProvider accountService;
 
-	protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException{
+	@Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException{
 		
 		if (isLoginRequest(request, response)) {
 			return true;
@@ -63,7 +64,8 @@ public class JsetsUserFilter extends JsetsAccessControlFilter {
 		}
 	}
 
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+	@Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 		return this.respondLogin(request, response);
 	}
 

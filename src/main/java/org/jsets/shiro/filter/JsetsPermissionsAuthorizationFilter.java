@@ -29,6 +29,7 @@ import org.apache.shiro.subject.Subject;
  */
 public class JsetsPermissionsAuthorizationFilter extends JsetsAuthorizationFilter{
 	
+    @Override
     public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
         Subject subject = getSubject(request, response);
         String[] perms = (String[]) mappedValue;

@@ -61,8 +61,9 @@ public class JsetsHmacMatcher implements CredentialsMatcher {
 			serverDigest = this.cryptoService.hmacDigest(hmacToken.getBaseString());
 		} else {
 			String appKey = accountProvider.loadAppKey(appId);
-			if(Strings.isNullOrEmpty(appKey)) 
-				throw new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY);
+			if(Strings.isNullOrEmpty(appKey)) {
+                throw new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY);
+            }
 			serverDigest = this.cryptoService.hmacDigest(hmacToken.getBaseString(),appKey);
 		}
 		

@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,34 +26,36 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.web.servlet.OncePerRequestFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsets.shiro.util.JCaptchaUtil;
+
 /**
  * 验证码生成过滤器
- * 
+ * <p>
  * author wangjie (https://github.com/wj596)
- * @date 2016年6月31日
  *
+ * @date 2016年6月31日
  */
-public class JcaptchaFilter extends OncePerRequestFilter {  
+public class JcaptchaFilter extends OncePerRequestFilter {
 
-	@Override
-	public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		HttpServletResponse httpResponse = WebUtils.toHttp(response);
-		httpResponse.setHeader("Cache-Control", "no-store"); 
-		httpResponse.setHeader("Pragma", "no-cache"); 
-		httpResponse.setDateHeader("Expires", 0); 
-		httpResponse.setContentType("image/jpeg"); 
+    @Override
+    public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletResponse httpResponse = WebUtils.toHttp(response);
+        httpResponse.setHeader("Cache-Control", "no-store");
+        httpResponse.setHeader("Pragma", "no-cache");
+        httpResponse.setDateHeader("Expires", 0);
+        httpResponse.setContentType("image/jpeg");
         ServletOutputStream output = httpResponse.getOutputStream();
-        try {  
+        try {
             BufferedImage image = JCaptchaUtil.generateCaptcha(WebUtils.toHttp(request));
             ImageIO.write(image, "jpg", output);
-            output.flush();  
-        } finally {  
-        	output.close();  
+            output.flush();
+        } finally {
+            output.close();
         }
-		
-	}
+
+    }
 }

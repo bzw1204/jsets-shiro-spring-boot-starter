@@ -65,6 +65,7 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
     	return super.isAccessAllowed(request,response,mappedValue);
     }
 	
+    @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
     	if (isLoginRequest(request, response)) {
             if (isLoginSubmission(request, response)) {//是否登陆请求
@@ -89,7 +90,8 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
         }
     }
 	
-	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,ServletResponse response) throws Exception {
+	@Override
+    protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
 		if (Commons.isAjax(WebUtils.toHttp(request))) {
 			Commons.ajaxSucceed(WebUtils.toHttp(response)
 					, MessageConfig.REST_CODE_AUTH_SUCCEED, MessageConfig.REST_MESSAGE_AUTH_SUCCEED);
@@ -99,8 +101,9 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
 		return false;
 	}
 
-	protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
-			ServletResponse response) {
+	@Override
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
+                                     ServletResponse response) {
 		if (Commons.isAjax(WebUtils.toHttp(request))) {
 			Commons.ajaxFailed(WebUtils.toHttp(response),HttpServletResponse.SC_UNAUTHORIZED
 									, MessageConfig.REST_CODE_AUTH_LOGIN_ERROR, e.getMessage());

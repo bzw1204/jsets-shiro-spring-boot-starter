@@ -130,8 +130,9 @@ public abstract class Commons {
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
+			}
 		}
 	}
 
@@ -155,8 +156,9 @@ public abstract class Commons {
 	public static Set<String> split(String str, String separator) {
 		
 		Set<String> set = Sets.newLinkedHashSet();
-		if (Strings.isNullOrEmpty(str))
+		if (Strings.isNullOrEmpty(str)) {
 			return set;
+		}
 		for (String s : str.split(separator)) {
 			set.add(s);
 		}
@@ -168,8 +170,9 @@ public abstract class Commons {
 	 */
 	public static Set<String> checkTimestamp(String str, String separator) {
 		Set<String> set = Sets.newLinkedHashSet();
-		if (Strings.isNullOrEmpty(str))
+		if (Strings.isNullOrEmpty(str)) {
 			return set;
+		}
 		for (String s : str.split(separator)) {
 			set.add(s);
 		}

@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,89 +17,90 @@
  */
 package org.jsets.shiro.cache;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * 基于MAP的缓存管理器
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
 @SuppressWarnings("all")
-public class MapCacheManager implements CacheManager{
+public class MapCacheManager implements CacheManager {
 
-	
-	private final ConcurrentMap<String, Cache> CACHES = new ConcurrentHashMap<String, Cache>(); 
-	
-	@Override
-	public <K, V> Cache<K, V> getCache(String cacheName) throws CacheException {
-		Cache<K, V> cache = CACHES.get(cacheName);  
-        if (null == cache) {  
-        	cache = new MapCache<K, V>(cacheName);  
-            CACHES.put(cacheName, cache);  
-        }  
-        return cache;  
-	}
-	
-	/**
-	 * 基于MAP的缓存
-	 * 
-	 * @author wangjie (https://github.com/wj596)
-	 * @date 2016年6月31日
-	 */
-	public static class MapCache<K,V> implements Cache<K,V>{
 
-		private final ConcurrentMap<K,V> storge = new ConcurrentHashMap<K,V>(); 
-		private final String cacheName; 
-		
-		public MapCache(String cacheName){
-			this.cacheName = cacheName;
-		}
-		
-		@Override
-		public void clear() throws CacheException {
-			storge.clear();
-		}
+    private final ConcurrentMap<String, Cache> CACHES = new ConcurrentHashMap<String, Cache>();
 
-		@Override
-		public V get(K key) throws CacheException {
-			return storge.get(key);
-		}
+    @Override
+    public <K, V> Cache<K, V> getCache(String cacheName) throws CacheException {
+        Cache<K, V> cache = CACHES.get(cacheName);
+        if (null == cache) {
+            cache = new MapCache<K, V>(cacheName);
+            CACHES.put(cacheName, cache);
+        }
+        return cache;
+    }
 
-		@Override
-		public Set<K> keys() {
-			return storge.keySet();
-		}
+    /**
+     * 基于MAP的缓存
+     *
+     * @author wangjie (https://github.com/wj596)
+     * @date 2016年6月31日
+     */
+    public static class MapCache<K, V> implements Cache<K, V> {
 
-		@Override
-		public V put(K key, V value) throws CacheException {
-			return storge.put(key, value);
-		}
+        private final ConcurrentMap<K, V> storge = new ConcurrentHashMap<K, V>();
+        private final String cacheName;
 
-		@Override
-		public V remove(K key) throws CacheException {
-			return storge.remove(key);
-		}
+        public MapCache(String cacheName) {
+            this.cacheName = cacheName;
+        }
 
-		@Override
-		public int size() {
-			return storge.size();
-		}
+        @Override
+        public void clear() throws CacheException {
+            storge.clear();
+        }
 
-		@Override
-		public Collection<V> values() {
-			return storge.values();
-		}
+        @Override
+        public V get(K key) throws CacheException {
+            return storge.get(key);
+        }
 
-		@Override
-		public String toString() {
-			return "cacheName:"+this.cacheName+",size:"+this.size();
-		}
-	}
+        @Override
+        public Set<K> keys() {
+            return storge.keySet();
+        }
+
+        @Override
+        public V put(K key, V value) throws CacheException {
+            return storge.put(key, value);
+        }
+
+        @Override
+        public V remove(K key) throws CacheException {
+            return storge.remove(key);
+        }
+
+        @Override
+        public int size() {
+            return storge.size();
+        }
+
+        @Override
+        public Collection<V> values() {
+            return storge.values();
+        }
+
+        @Override
+        public String toString() {
+            return "cacheName:" + this.cacheName + ",size:" + this.size();
+        }
+    }
 }

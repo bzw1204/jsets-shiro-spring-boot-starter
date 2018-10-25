@@ -259,12 +259,15 @@ public class JsetsShiroManager {
 		this.buildFilterManager();
 		
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-		if(Commons.hasLen(this.filterManager.getLoginUrl()))
-			shiroFilterFactoryBean.setLoginUrl(filterManager.getLoginUrl());
-		if(Commons.hasLen(this.filterManager.getSuccessUrl()))
-			shiroFilterFactoryBean.setSuccessUrl(filterManager.getSuccessUrl());
-		if(Commons.hasLen(this.filterManager.getUnauthorizedUrl()))
-			shiroFilterFactoryBean.setUnauthorizedUrl(filterManager.getUnauthorizedUrl());
+		if(Commons.hasLen(this.filterManager.getLoginUrl())) {
+            shiroFilterFactoryBean.setLoginUrl(filterManager.getLoginUrl());
+        }
+		if(Commons.hasLen(this.filterManager.getSuccessUrl())) {
+            shiroFilterFactoryBean.setSuccessUrl(filterManager.getSuccessUrl());
+        }
+		if(Commons.hasLen(this.filterManager.getUnauthorizedUrl())) {
+            shiroFilterFactoryBean.setUnauthorizedUrl(filterManager.getUnauthorizedUrl());
+        }
 		shiroFilterFactoryBean.setSecurityManager(this.getSecurityManager());
 		shiroFilterFactoryBean.setFilters(filterManager.getAllFilters());
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterManager.getAllFilterChain());

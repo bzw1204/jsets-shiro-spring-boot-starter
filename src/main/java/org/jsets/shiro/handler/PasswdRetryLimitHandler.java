@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,20 @@
  * </p>
  */
 package org.jsets.shiro.handler;
+
 /**
  * 密码连续错误次数超限处理器接口
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
 public interface PasswdRetryLimitHandler {
 
-	public void handle(String account);
-	
+    /**
+     * 拦截器
+     *
+     * @param account
+     */
+    void handle(String account);
+
 }

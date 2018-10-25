@@ -42,6 +42,7 @@ public class HmacRealm extends AuthorizingRealm{
 	private  ShiroStatelessAccountProvider accountProvider;
 	
 
+	@Override
 	public Class<?> getAuthenticationTokenClass() {
 		return HmacToken.class;
 	}
@@ -52,7 +53,9 @@ public class HmacRealm extends AuthorizingRealm{
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		// 只认证HmacToken
-		if(!(token instanceof HmacToken)) return null;
+		if(!(token instanceof HmacToken)) {
+            return null;
+        }
 		HmacToken hmacToken = (HmacToken)token;
 		String appId = hmacToken.getAppId();
 		String digest = hmacToken.getDigest();
@@ -71,10 +74,12 @@ public class HmacRealm extends AuthorizingRealm{
 			SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
 			Set<String> roles = this.accountProvider.loadRoles(appId);
 			Set<String> permissions = this.accountProvider.loadPermissions(appId);
-			if(null!=roles&&!roles.isEmpty())
-				info.setRoles(roles);
-			if(null!=permissions&&!permissions.isEmpty())
-				info.setStringPermissions(permissions);
+			if(null!=roles&&!roles.isEmpty()) {
+                info.setRoles(roles);
+            }
+			if(null!=permissions&&!permissions.isEmpty()) {
+                info.setStringPermissions(permissions);
+            }
 	        return info;
 		}
 		return null;

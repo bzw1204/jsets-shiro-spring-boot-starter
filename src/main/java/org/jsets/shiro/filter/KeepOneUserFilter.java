@@ -47,10 +47,13 @@ public class KeepOneUserFilter extends JsetsAccessControlFilter {
 
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-		if(!this.properties.isKeepOneEnabled()) return true;
+		if(!this.properties.isKeepOneEnabled()) {
+            return true;
+        }
 		return false;
 	}
 
+	@Override
 	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 		Subject subject = getSubject(request, response);
 		if (!subject.isAuthenticated() && !subject.isRemembered()) {
