@@ -28,14 +28,14 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.jsets.shiro.authc.StatelessLocals;
+import org.jsets.shiro.authc.AbstractStatelessLocals;
 import org.jsets.shiro.cache.CacheDelegator;
 import org.jsets.shiro.config.ShiroProperties;
 import org.jsets.shiro.filter.FilterManager;
 import org.jsets.shiro.model.Account;
-import org.jsets.shiro.model.StatelessLogined;
+import org.jsets.shiro.model.StatelessLogin;
 import org.jsets.shiro.realm.RealmManager;
-import org.jsets.shiro.service.ShiroCryptoService;
+import org.jsets.shiro.service.impl.ShiroCryptoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class ShiroUtils {
      * @return JSON WEB TOKEN
      */
     public static String issueJwt(String subject, String issuer, Long period, String roles, String permissions, SignatureAlgorithm algorithm) {
-        return CryptoUtil.issueJwt(shiroProperties.getJwtSecretKey(), subject, issuer, period, roles, permissions, algorithm);
+        return AbstractCryptoUtil.issueJwt(shiroProperties.getJwtSecretKey(), subject, issuer, period, roles, permissions, algorithm);
     }
 
     /**
@@ -91,7 +91,7 @@ public class ShiroUtils {
      *
      * @param jwt json web token
      */
-    public static StatelessLogined parseJwt(String jwt) {
+    public static StatelessLogin parseJwt(String jwt) {
         return cryptoService.parseJwt(jwt);
     }
 
@@ -113,7 +113,7 @@ public class ShiroUtils {
         if (null != currentSession) {
             return (Account) currentSession.getAttribute(ShiroProperties.ATTRIBUTE_SESSION_CURRENT_USER);
         } else {
-            return StatelessLocals.getAccount();
+            return AbstractStatelessLocals.getAccount();
         }
     }
 
@@ -133,16 +133,18 @@ public class ShiroUtils {
      */
     public static boolean hasPerms(String permName) {
         try {
-            SecurityUtils.getSubject().checkPermission("testPermission");
+            SecurityUtils.getSubject().checkPermission(permName);
             return true;
         } catch (AuthorizationException e) {
-            //不处理
+            // 不处理
         }
         return false;
     }
 
     /**
      * 当前用户切换成switchUserId的身份
+     *
+     * @param switchUserId
      */
     public static void runAs(String switchUserId) {
         SecurityUtils.getSubject().runAs(new SimplePrincipalCollection(switchUserId, ""));
@@ -166,6 +168,9 @@ public class ShiroUtils {
 
     /**
      * 设置认证信息
+     *
+     * @param request
+     * @param message
      */
     public static void setAuthMessage(HttpServletRequest request, String message) {
         request.setAttribute(ShiroProperties.ATTRIBUTE_REQUEST_AUTH_MESSAGE, message);
@@ -214,6 +219,8 @@ public class ShiroUtils {
      * 删除account的认证、授权缓存
      * <br>如果启用了auth缓存，当用户的认证信息和角色信息发生了改变，一定要执行此操作。
      * <br>否则只能等到用户再次登录这些变更才能生效。
+     *
+     * @param account
      */
     public static void clearAuthCache(String account) {
         for (Realm cachedRealm : realmManager.getCachedRealms()) {
@@ -285,4 +292,5 @@ public class ShiroUtils {
     public static void setFilterManager(FilterManager filterManager) {
         ShiroUtils.filterManager = filterManager;
     }
+
 }

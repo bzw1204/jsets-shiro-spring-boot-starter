@@ -22,7 +22,7 @@ import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.SubjectContext;
 import org.apache.shiro.web.mgt.DefaultWebSubjectFactory;
-import org.jsets.shiro.util.Commons;
+import org.jsets.shiro.util.AbstractCommons;
 
 /**
  * 扩展自DefaultWebSubjectFactory,对于无状态的TOKEN不创建session
@@ -45,7 +45,7 @@ public class JsetsSubjectFactory extends DefaultWebSubjectFactory {
     public Subject createSubject(SubjectContext context) {
     	this.storageEvaluator.setSessionStorageEnabled(Boolean.TRUE);
     	AuthenticationToken token = context.getAuthenticationToken();
-    	if(Commons.isStatelessToken(token)){
+    	if(AbstractCommons.isStatelessToken(token)){
             // 不创建 session 
             context.setSessionCreationEnabled(false);
             // 不持久化session

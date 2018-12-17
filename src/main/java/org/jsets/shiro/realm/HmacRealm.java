@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,75 +17,71 @@
  */
 package org.jsets.shiro.realm;
 
-import java.util.Set;
+import cn.hutool.core.util.StrUtil;
+import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.jsets.shiro.cache.CacheDelegator;
-import org.jsets.shiro.config.MessageConfig;
+import org.jsets.shiro.consts.NumberConsts;
 import org.jsets.shiro.service.ShiroStatelessAccountProvider;
 import org.jsets.shiro.token.HmacToken;
 
+import java.util.Set;
+
+import static org.jsets.shiro.consts.EncryptionTypeConsts.HMAC;
+import static org.jsets.shiro.realm.PasswordRealm.buildAuthorizationInfo;
+
 /**
  * 基于HMAC（ 散列消息认证码）的控制域
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public class HmacRealm extends AuthorizingRealm{
-	
-	private  ShiroStatelessAccountProvider accountProvider;
-	
+public class HmacRealm extends AuthorizingRealm {
 
-	@Override
-	public Class<?> getAuthenticationTokenClass() {
-		return HmacToken.class;
-	}
-	
-	/**
-	 *  认证
-	 */
-	@Override
-	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		// 只认证HmacToken
-		if(!(token instanceof HmacToken)) {
+    @Setter
+    private ShiroStatelessAccountProvider accountProvider;
+
+
+    @Override
+    public Class<?> getAuthenticationTokenClass() {
+        return HmacToken.class;
+    }
+
+    /**
+     * 认证
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        // 只认证HmacToken
+        if (!(token instanceof HmacToken)) {
             return null;
         }
-		HmacToken hmacToken = (HmacToken)token;
-		String appId = hmacToken.getAppId();
-		String digest = hmacToken.getDigest();
-        return new SimpleAuthenticationInfo("hmac:{"+appId+"}",digest,this.getName());
-	}
-	
-	/** 
-     * 授权 
-     */  
-	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		String payload = (String) principals.getPrimaryPrincipal();
-		if (payload.startsWith("hmac:") && payload.charAt(5) == '{' 
-									    && payload.charAt(payload.length() - 1) == '}') { 
-			String appId = payload.substring(6,payload.length() - 1);
-			SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
-			Set<String> roles = this.accountProvider.loadRoles(appId);
-			Set<String> permissions = this.accountProvider.loadPermissions(appId);
-			if(null!=roles&&!roles.isEmpty()) {
-                info.setRoles(roles);
-            }
-			if(null!=permissions&&!permissions.isEmpty()) {
-                info.setStringPermissions(permissions);
-            }
-	        return info;
-		}
-		return null;
-	}
+        HmacToken hmacToken = (HmacToken) token;
+        String appId = hmacToken.getAppId();
+        String digest = hmacToken.getDigest();
+        return new SimpleAuthenticationInfo("hmac:{" + appId + "}", digest, this.getName());
+    }
 
-	public void setAccountProvider(ShiroStatelessAccountProvider accountProvider) {
-		this.accountProvider = accountProvider;
-	}
+    /**
+     * 授权
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        String payload = (String) principals.getPrimaryPrincipal();
+
+        boolean isHmac = payload.startsWith(HMAC) && StrUtil.DELIM_START.equals(payload.charAt(NumberConsts.FIVE)) && StrUtil.DELIM_END.equals(payload.charAt(payload.length() - 1));
+        if (isHmac) {
+            String appId = payload.substring(6, payload.length() - 1);
+            Set<String> roles = this.accountProvider.loadRoles(appId);
+            Set<String> permissions = this.accountProvider.loadPermissions(appId);
+            return buildAuthorizationInfo(roles, permissions);
+        }
+        return null;
+    }
+
 }

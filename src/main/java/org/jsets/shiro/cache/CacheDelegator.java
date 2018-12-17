@@ -17,6 +17,7 @@
  */
 package org.jsets.shiro.cache;
 
+import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.cache.Cache;
@@ -35,14 +36,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CacheDelegator {
 
+    @Setter
     private CacheManager cacheManager;
+    @Setter
     private short cacheType;
     private final Object cacheMonitor = new Object();
 
     /**
      * 获取并增加密码重试次数
      */
-    public int incPasswdRetryCount(String account) {
+    public int incPasswordRetryCount(String account) {
         Cache<String, Integer> cache = this.cacheManager.getCache(ShiroProperties.CACHE_NAME_PASSWORD_RETRY);
         synchronized (cacheMonitor) {
             Integer count = cache.get(account);
@@ -57,7 +60,7 @@ public class CacheDelegator {
     /**
      * 清扫密码重试次数
      */
-    public void cleanPasswdRetryCount(String account) {
+    public void cleanPasswordRetryCount(String account) {
         Cache<String, AtomicInteger> cache = this.cacheManager.getCache(ShiroProperties.CACHE_NAME_PASSWORD_RETRY);
         cache.remove(account);
     }
@@ -110,11 +113,4 @@ public class CacheDelegator {
         return true;
     }
 
-    public void setCacheManager(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
-    public void setCacheType(short cacheType) {
-        this.cacheType = cacheType;
-    }
 }

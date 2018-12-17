@@ -15,37 +15,30 @@
  * limitations under the License.
  * </p>
  */
-package org.jsets.shiro.token;
+package org.jsets.shiro.authc;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.jsets.shiro.model.Account;
 
 /**
- * JWT(json web token)令牌
+ * 无状态验证本地缓存
+ * <br>由于无SESSION,账号信息缓存于此供应用使用
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@Getter
-@Setter
-public class JwtToken extends AbstractStatelessToken {
+public abstract class AbstractStatelessLocals {
 
-    private static final long serialVersionUID = 1832943548774576547L;
+    private static final ThreadLocal<Account> ACCOUNTS = new ThreadLocal<Account>();
 
-    private String jwt;
-
-    public JwtToken(String host, String jwt) {
-        super(host);
-        this.jwt = jwt;
+    public static Account getAccount() {
+        return ACCOUNTS.get();
     }
 
-    @Override
-    public Object getPrincipal() {
-        return this.jwt;
+    protected static void setAccount(Account account) {
+        ACCOUNTS.set(account);
     }
 
-    @Override
-    public Object getCredentials() {
-        return Boolean.TRUE;
+    protected static void removeAccount() {
+        ACCOUNTS.remove();
     }
 }

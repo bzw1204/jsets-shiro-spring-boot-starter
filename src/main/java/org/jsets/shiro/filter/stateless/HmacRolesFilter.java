@@ -20,12 +20,13 @@ package org.jsets.shiro.filter.stateless;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import cn.hutool.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsets.shiro.config.MessageConfig;
-import org.jsets.shiro.util.Commons;
+import org.jsets.shiro.util.AbstractCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,9 @@ import org.slf4j.LoggerFactory;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public class HmacRolesFilter extends StatelessFilter {
+public class HmacRolesFilter extends AbstractStatelessFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HmacAuthcFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmacAuthFilter.class);
 
 
     @Override
@@ -53,7 +54,7 @@ public class HmacRolesFilter extends StatelessFilter {
                 return this.checkRoles(subject, mappedValue);
             } catch (AuthenticationException e) {
                 LOGGER.error(request.getRemoteHost() + " HMAC鉴权  " + e.getMessage());
-                Commons.restFailed(WebUtils.toHttp(response), MessageConfig.REST_CODE_AUTH_UNAUTHORIZED, e.getMessage());
+                AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
             }
         }
         return false;

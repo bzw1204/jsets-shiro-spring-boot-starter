@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
 package org.jsets.shiro.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -34,8 +36,8 @@ import org.jsets.shiro.cache.SpringCacheManager;
 import org.jsets.shiro.filter.FilterManager;
 import org.jsets.shiro.handler.DefaultSessionListener;
 import org.jsets.shiro.realm.RealmManager;
-import org.jsets.shiro.service.ShiroCryptoService;
-import org.jsets.shiro.util.Commons;
+import org.jsets.shiro.service.impl.ShiroCryptoService;
+import org.jsets.shiro.util.AbstractCommons;
 import org.jsets.shiro.util.ShiroUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +46,10 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -54,293 +58,249 @@ import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.session.SessionListener;
 import com.google.common.collect.Lists;
+
 /**
  * SHIRO构造器
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@Setter
+@Getter
 public class JsetsShiroManager {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(JsetsShiroManager.class);
 
-	private final BeanFactory beanFactory;
-	private final ShiroProperties properties;
-	private final SecurityManagerConfig managerConfig;
-	private final FilterChainConfig filterConfig;
-	private DefaultWebSessionManager sessionManager;
-	private CookieRememberMeManager rememberMeManager;
-	private CacheManager cacheManager;
-	private CacheDelegator cacheDelegator;
-	private JsetsPasswdMatcher passwdMatcher;
-	private RealmManager realmManager;
-	private FilterManager filterManager;
-	private DefaultWebSecurityManager securityManager;
-	private ShiroFilterFactoryBean shiroFilterFactoryBean;
-	private ShiroCryptoService cryptoService;
-	private short cacheType = Commons.CACHE_TYPE_MAP;
-	private final AtomicBoolean initialized = new AtomicBoolean(Boolean.FALSE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsetsShiroManager.class);
 
-	protected JsetsShiroManager(BeanFactory beanFactory,ShiroProperties properties, 
-						SecurityManagerConfig managerConfig,FilterChainConfig filterConfig) {
-		this.beanFactory = beanFactory;
-		this.properties = properties;
-		this.managerConfig = managerConfig;
-		this.filterConfig = filterConfig;
-	}
+    private final BeanFactory beanFactory;
+    private final ShiroProperties properties;
+    private final SecurityManagerConfig managerConfig;
+    private final FilterChainConfig filterConfig;
+    private DefaultWebSessionManager sessionManager;
+    private CookieRememberMeManager rememberMeManager;
+    private CacheManager cacheManager;
+    private CacheDelegator cacheDelegator;
+    private JsetsPasswdMatcher passwdMatcher;
+    private RealmManager realmManager;
+    private FilterManager filterManager;
+    private DefaultWebSecurityManager securityManager;
+    private ShiroFilterFactoryBean shiroFilterFactoryBean;
+    private ShiroCryptoService cryptoService;
+    private short cacheType = AbstractCommons.CACHE_TYPE_MAP;
+    private final AtomicBoolean initialized = new AtomicBoolean(Boolean.FALSE);
 
-	private void buildSessionManager() {
-		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-		sessionManager.setGlobalSessionTimeout(this.properties.getSessionTimeout());
-		sessionManager.setSessionIdUrlRewritingEnabled(Boolean.FALSE);
-		sessionManager.setSessionDAO(this.getSessionDAO());
-		sessionManager.setSessionListeners(this.getSessionListeners());
-		sessionManager.setSessionValidationInterval(this.properties.getSessionValidationInterval());
-		this.sessionManager = sessionManager;
-	}
+    protected JsetsShiroManager(BeanFactory beanFactory, ShiroProperties properties,
+                                SecurityManagerConfig managerConfig, FilterChainConfig filterConfig) {
+        this.beanFactory = beanFactory;
+        this.properties = properties;
+        this.managerConfig = managerConfig;
+        this.filterConfig = filterConfig;
+    }
 
-	private SessionDAO getSessionDAO() {
-		if (null != this.managerConfig.getSessionDAO()) {
-			return this.managerConfig.getSessionDAO();
-		} else {
-			return new EnterpriseCacheSessionDAO();
-		}
-	}
+    private void buildSessionManager() {
+        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+        sessionManager.setGlobalSessionTimeout(this.properties.getSessionTimeout());
+        sessionManager.setSessionIdUrlRewritingEnabled(Boolean.FALSE);
+        sessionManager.setSessionDAO(this.getSessionDAO());
+        sessionManager.setSessionListeners(this.getSessionListeners());
+        sessionManager.setSessionValidationInterval(this.properties.getSessionValidationInterval());
+        this.sessionManager = sessionManager;
+    }
 
-	private List<SessionListener> getSessionListeners() {
-		List<SessionListener> listeners = Lists.newLinkedList();
-		if (!this.managerConfig.getSessionListeners().isEmpty()) {
-			listeners.addAll(this.managerConfig.getSessionListeners());
-		}
-		DefaultSessionListener defSessionListener = new DefaultSessionListener();
-		listeners.add(defSessionListener);
-		return listeners;
-	}
+    private SessionDAO getSessionDAO() {
+        if (null != this.managerConfig.getSessionDAO()) {
+            return this.managerConfig.getSessionDAO();
+        } else {
+            return new EnterpriseCacheSessionDAO();
+        }
+    }
 
-	private void buildRememberMeManager() {
-		CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
-		rememberMeManager.setCipherKey(CodecSupport.toBytes(this.properties.getRemembermeSecretKey()));
-		rememberMeManager.setCookie(this.getRememberMeCookie());
-		this.rememberMeManager = rememberMeManager;
-	}
+    private List<SessionListener> getSessionListeners() {
+        List<SessionListener> listeners = Lists.newLinkedList();
+        if (!this.managerConfig.getSessionListeners().isEmpty()) {
+            listeners.addAll(this.managerConfig.getSessionListeners());
+        }
+        DefaultSessionListener defSessionListener = new DefaultSessionListener();
+        listeners.add(defSessionListener);
+        return listeners;
+    }
 
-	private SimpleCookie getRememberMeCookie() {
-		if (null != this.managerConfig.getRememberMeCookie()) {
-			return this.managerConfig.getRememberMeCookie();
-		} else {
-			SimpleCookie simpleCookie = new SimpleCookie();
-			simpleCookie.setName(Commons.REMEMBERME_COOKIE_NAME);
-			simpleCookie.setHttpOnly(Boolean.TRUE);
-			simpleCookie.setMaxAge(this.properties.getRemembermeMaxAge());
-			return simpleCookie;
-		}
-	}
+    private void buildRememberMeManager() {
+        CookieRememberMeManager rememberMeManager = new CookieRememberMeManager();
+        rememberMeManager.setCipherKey(CodecSupport.toBytes(this.properties.getRemembermeSecretKey()));
+        rememberMeManager.setCookie(this.getRememberMeCookie());
+        this.rememberMeManager = rememberMeManager;
+    }
 
-	private void buildCacheManager() {
-		// 使用用户定制的CacheManager
-		if (null != this.managerConfig.getCacheManager()) {
-			this.setCacheType(Commons.CACHE_TYPE_CUSTOM);
-			this.cacheManager = this.managerConfig.getCacheManager();
-			return;
-		} 
-		// 使用Spring CacheManager
-		DefaultListableBeanFactory listableBeanFactory = (DefaultListableBeanFactory) this.beanFactory;
-		if (listableBeanFactory.getBeanNamesForType(org.springframework.cache.CacheManager.class).length>0) {
-			org.springframework.cache.CacheManager springCacheManager = 
-								listableBeanFactory.getBean(org.springframework.cache.CacheManager.class);
-			
-			if(null!=springCacheManager// EhCache
-						&&springCacheManager instanceof org.springframework.cache.ehcache.EhCacheCacheManager){
-				EhCacheManager ehCacheManager = new EhCacheManager();
-				ehCacheManager.setCacheManager(((org.springframework.cache.ehcache.EhCacheCacheManager)springCacheManager).getCacheManager());
-				this.setCacheType(Commons.CACHE_TYPE_EHCACHE);
-				this.cacheManager = ehCacheManager;
-				return;
-			}
-			if(null!=springCacheManager// Redis
-					&&springCacheManager instanceof org.springframework.data.redis.cache.RedisCacheManager){
-				RedisConnectionFactory redisConnectionFactory = this.beanFactory.getBean(RedisConnectionFactory.class);
-				GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
-				RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
-				redisTemplate.setConnectionFactory(redisConnectionFactory);
-				redisTemplate.setKeySerializer(jsonSerializer);
-				redisTemplate.setHashKeySerializer(jsonSerializer);
-				redisTemplate.setBeanClassLoader(this.getClass().getClassLoader());
-				redisTemplate.afterPropertiesSet();
-				RedisCacheManager redisCacheManager = new RedisCacheManager();
-				redisCacheManager.setRedisTemplate(redisTemplate);
-				this.setCacheType(Commons.CACHE_TYPE_REDIS);
-				this.cacheManager = redisCacheManager;
-				return;
-			}
-			if(null!=springCacheManager){// OTHER
-				this.setCacheType(Commons.CACHE_TYPE_SPRING);
-				this.cacheManager = new SpringCacheManager(springCacheManager);
-				return;
-			}
-		} 
-		// 使用默认的CacheManager 
-		this.setCacheType(Commons.CACHE_TYPE_MAP);
-		this.cacheManager = new MapCacheManager();	
-		LOGGER.info("jsets-shiro cacheManager: "+this.cacheManager);
-	}
+    private SimpleCookie getRememberMeCookie() {
+        if (null != this.managerConfig.getRememberMeCookie()) {
+            return this.managerConfig.getRememberMeCookie();
+        } else {
+            SimpleCookie simpleCookie = new SimpleCookie();
+            simpleCookie.setName(AbstractCommons.REMEMBER_ME_COOKIE_NAME);
+            simpleCookie.setHttpOnly(Boolean.TRUE);
+            simpleCookie.setMaxAge(this.properties.getRemembermeMaxAge());
+            return simpleCookie;
+        }
+    }
 
-	private void buildCacheDelegator() {
-		CacheDelegator cacheDelegator = new CacheDelegator();
-		cacheDelegator.setCacheManager(this.cacheManager);
-		cacheDelegator.setCacheType(this.cacheType);
-		this.cacheDelegator = cacheDelegator;
-	}
+    private void buildCacheManager() {
+        // 使用用户定制的CacheManager
+        if (null != this.managerConfig.getCacheManager()) {
+            this.setCacheType(AbstractCommons.CACHE_TYPE_CUSTOM);
+            this.cacheManager = this.managerConfig.getCacheManager();
+            return;
+        }
+        // 使用Spring CacheManager
+        DefaultListableBeanFactory listableBeanFactory = (DefaultListableBeanFactory) this.beanFactory;
+        if (listableBeanFactory.getBeanNamesForType(org.springframework.cache.CacheManager.class).length > 0) {
+            org.springframework.cache.CacheManager springCacheManager =
+                    listableBeanFactory.getBean(org.springframework.cache.CacheManager.class);
+            // EhCache
+            if (null != springCacheManager
+                    && springCacheManager instanceof org.springframework.cache.ehcache.EhCacheCacheManager) {
+                EhCacheManager ehCacheManager = new EhCacheManager();
+                ehCacheManager.setCacheManager(((org.springframework.cache.ehcache.EhCacheCacheManager) springCacheManager).getCacheManager());
+                this.setCacheType(AbstractCommons.CACHE_TYPE_EHCACHE);
+                this.cacheManager = ehCacheManager;
+                return;
+            }
+            // Redis
+            if (null != springCacheManager
+                    && springCacheManager instanceof org.springframework.data.redis.cache.RedisCacheManager) {
+                RedisConnectionFactory redisConnectionFactory = this.beanFactory.getBean(RedisConnectionFactory.class);
+                GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
+                RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
+                redisTemplate.setConnectionFactory(redisConnectionFactory);
+                redisTemplate.setKeySerializer(jsonSerializer);
+                redisTemplate.setHashKeySerializer(jsonSerializer);
+                redisTemplate.setBeanClassLoader(this.getClass().getClassLoader());
+                redisTemplate.afterPropertiesSet();
+                RedisCacheManager redisCacheManager = new RedisCacheManager();
+                redisCacheManager.setRedisTemplate(redisTemplate);
+                this.setCacheType(AbstractCommons.CACHE_TYPE_REDIS);
+                this.cacheManager = redisCacheManager;
+                return;
+            }
+            // OTHER
+            if (null != springCacheManager) {
+                this.setCacheType(AbstractCommons.CACHE_TYPE_SPRING);
+                this.cacheManager = new SpringCacheManager(springCacheManager);
+                return;
+            }
+        }
+        // 使用默认的CacheManager
+        this.setCacheType(AbstractCommons.CACHE_TYPE_MAP);
+        this.cacheManager = new MapCacheManager();
+        LOGGER.info("jsets-shiro cacheManager: " + this.cacheManager);
+    }
 
-	private void buildPasswdMatcher() {
+    private void buildCacheDelegator() {
+        CacheDelegator cacheDelegator = new CacheDelegator();
+        cacheDelegator.setCacheManager(this.cacheManager);
+        cacheDelegator.setCacheType(this.cacheType);
+        this.cacheDelegator = cacheDelegator;
+    }
 
-		JsetsPasswdMatcher passwdMatcher = new JsetsPasswdMatcher();
-		passwdMatcher.setProperties(this.properties);
-		passwdMatcher.setCacheDelegator(this.cacheDelegator);
-		passwdMatcher.setCryptoService(this.cryptoService);
-		passwdMatcher.setMessages(MessageConfig.ins());
-		this.passwdMatcher = passwdMatcher;
-	}
-	
-	private void buildRealmManager() {
-		RealmManager realmManager = new RealmManager();
-		realmManager.setProperties(this.properties);
-		realmManager.setJsetsPasswdMatcher(this.passwdMatcher);
-		realmManager.setShiroCryptoService(this.cryptoService);
-		realmManager.setAccountProvider(this.managerConfig.getAccountProvider());
-		realmManager.setCustomRealms(this.managerConfig.getRealms());
-		realmManager.setStatelessAccountProvider(this.managerConfig.getStatelessAccountProvider());
-		realmManager.setMessages(MessageConfig.ins());
-		realmManager.setCacheDelegator(this.cacheDelegator);
-		realmManager.initRealms();
-		this.realmManager = realmManager;
-	}
+    private void buildPasswdMatcher() {
 
-	private void buildSecurityManager(){
-		this.buildSessionManager();
-		this.buildRememberMeManager();
-		this.buildCacheManager();
-		this.buildCacheDelegator();
-		this.buildPasswdMatcher();
-		this.buildRealmManager();
-		
-		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-		securityManager.setSessionManager(this.sessionManager);
-		securityManager.setRememberMeManager(this.rememberMeManager);
-		securityManager.setAuthenticator(new JsetsModularRealmAuthenticator());
-		DefaultSubjectDAO subjectDAO = (DefaultSubjectDAO) securityManager.getSubjectDAO();
-		DefaultSessionStorageEvaluator storageEvaluator = 
-					(DefaultSessionStorageEvaluator)subjectDAO.getSessionStorageEvaluator();
-		JsetsSubjectFactory subjectFactory = new JsetsSubjectFactory(storageEvaluator);
-		securityManager.setSubjectFactory(subjectFactory);
-		securityManager.setCacheManager(this.cacheManager);
-		securityManager.setRealms(this.realmManager.getAllRealms());
-		SecurityUtils.setSecurityManager(securityManager);
-		this.securityManager =  securityManager;
-	}
-	
-	private void buildFilterManager() {	
-		FilterManager filterManager = new FilterManager();
-		filterManager.setProperties(this.properties);
-		filterManager.setSessionManager(this.sessionManager);
-		filterManager.setCacheDelegator(this.cacheDelegator);
-		filterManager.setAccountProvider(this.managerConfig.getAccountProvider());
-		filterManager.setCustomFilters(this.filterConfig.getFilters());
-		filterManager.setRulesProvider(this.filterConfig.getShiroFilteRulesProvider());
-		filterManager.setMessages(MessageConfig.ins());
-		filterManager.initFixations();
-		filterManager.initFilters();
-		filterManager.initFilterChain();
-		this.filterManager = filterManager;
-	}
-	
-	private void buildShiroFilterFactoryBean() {
-		
-		this.buildFilterManager();
-		
-		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-		if(Commons.hasLen(this.filterManager.getLoginUrl())) {
+        JsetsPasswdMatcher passwdMatcher = new JsetsPasswdMatcher();
+        passwdMatcher.setProperties(this.properties);
+        passwdMatcher.setCacheDelegator(this.cacheDelegator);
+        passwdMatcher.setCryptoService(this.cryptoService);
+        passwdMatcher.setMessages(MessageConfig.ins());
+        this.passwdMatcher = passwdMatcher;
+    }
+
+    private void buildRealmManager() {
+        RealmManager realmManager = new RealmManager();
+        realmManager.setProperties(this.properties);
+        realmManager.setJsetsPasswdMatcher(this.passwdMatcher);
+        realmManager.setShiroCryptoService(this.cryptoService);
+        realmManager.setAccountProvider(this.managerConfig.getAccountProvider());
+        realmManager.setCustomRealms(this.managerConfig.getRealms());
+        realmManager.setStatelessAccountProvider(this.managerConfig.getStatelessAccountProvider());
+        realmManager.setMessages(MessageConfig.ins());
+        realmManager.setCacheDelegator(this.cacheDelegator);
+        realmManager.initRealms();
+        this.realmManager = realmManager;
+    }
+
+    private void buildSecurityManager() {
+        this.buildSessionManager();
+        this.buildRememberMeManager();
+        this.buildCacheManager();
+        this.buildCacheDelegator();
+        this.buildPasswdMatcher();
+        this.buildRealmManager();
+
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        securityManager.setSessionManager(this.sessionManager);
+        securityManager.setRememberMeManager(this.rememberMeManager);
+        securityManager.setAuthenticator(new JsetsModularRealmAuthenticator());
+        DefaultSubjectDAO subjectDAO = (DefaultSubjectDAO) securityManager.getSubjectDAO();
+        DefaultSessionStorageEvaluator storageEvaluator =
+                (DefaultSessionStorageEvaluator) subjectDAO.getSessionStorageEvaluator();
+        JsetsSubjectFactory subjectFactory = new JsetsSubjectFactory(storageEvaluator);
+        securityManager.setSubjectFactory(subjectFactory);
+        securityManager.setCacheManager(this.cacheManager);
+        securityManager.setRealms(this.realmManager.getAllRealms());
+        SecurityUtils.setSecurityManager(securityManager);
+        this.securityManager = securityManager;
+    }
+
+    private void buildFilterManager() {
+        FilterManager filterManager = new FilterManager();
+        filterManager.setProperties(this.properties);
+        filterManager.setSessionManager(this.sessionManager);
+        filterManager.setCacheDelegator(this.cacheDelegator);
+        filterManager.setAccountProvider(this.managerConfig.getAccountProvider());
+        filterManager.setCustomFilters(this.filterConfig.getFilters());
+        filterManager.setRulesProvider(this.filterConfig.getShiroFilteRulesProvider());
+        filterManager.setMessages(MessageConfig.ins());
+        filterManager.initFixations();
+        filterManager.initFilters();
+        filterManager.initFilterChain();
+        this.filterManager = filterManager;
+    }
+
+    private void buildShiroFilterFactoryBean() {
+
+        this.buildFilterManager();
+
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        if (AbstractCommons.hasLen(this.filterManager.getLoginUrl())) {
             shiroFilterFactoryBean.setLoginUrl(filterManager.getLoginUrl());
         }
-		if(Commons.hasLen(this.filterManager.getSuccessUrl())) {
+        if (AbstractCommons.hasLen(this.filterManager.getSuccessUrl())) {
             shiroFilterFactoryBean.setSuccessUrl(filterManager.getSuccessUrl());
         }
-		if(Commons.hasLen(this.filterManager.getUnauthorizedUrl())) {
+        if (AbstractCommons.hasLen(this.filterManager.getUnauthorizedUrl())) {
             shiroFilterFactoryBean.setUnauthorizedUrl(filterManager.getUnauthorizedUrl());
         }
-		shiroFilterFactoryBean.setSecurityManager(this.getSecurityManager());
-		shiroFilterFactoryBean.setFilters(filterManager.getAllFilters());
-		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterManager.getAllFilterChain());
-		this.shiroFilterFactoryBean = shiroFilterFactoryBean;
-	}
-	
-
-	
-	protected void build() {	
-		if(!initialized.getAndSet(Boolean.TRUE)){
-			this.buildSecurityManager();
-			this.buildShiroFilterFactoryBean();
-			afterBuild();
-		}
-	}
-	
-	private void afterBuild(){
-		ShiroUtils.setCryptoService(this.cryptoService);
-		ShiroUtils.setFilterManager(this.filterManager);
-		ShiroUtils.setRealmManager(this.realmManager);
-		ShiroUtils.setSessionManager(this.sessionManager);
-		ShiroUtils.setShiroCacheDelegator(this.cacheDelegator);
-		ShiroUtils.setShiroFilterFactoryBean(this.shiroFilterFactoryBean);
-		ShiroUtils.setShiroProperties(this.properties);
-	}
+        shiroFilterFactoryBean.setSecurityManager(this.getSecurityManager());
+        shiroFilterFactoryBean.setFilters(filterManager.getAllFilters());
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterManager.getAllFilterChain());
+        this.shiroFilterFactoryBean = shiroFilterFactoryBean;
+    }
 
 
-	public ShiroProperties getProperties() {
-		return properties;
-	}
-	public CacheManager getCacheManager() {
-		return cacheManager;
-	}
-	public CacheDelegator getCacheDelegator() {
-		return cacheDelegator;
-	}
-	public JsetsPasswdMatcher getPasswdMatcher() {
-		return passwdMatcher;
-	}
-	public RealmManager getRealmManager() {
-		return realmManager;
-	}
-	public ShiroCryptoService getCryptoService() {
-		return cryptoService;
-	}
-	//public void setRedisConnectionFactory(RedisConnectionFactory redisConnectionFactory) {
-		//this.redisConnectionFactory = redisConnectionFactory;
-	//}
-	public short getCacheType() {
-		return cacheType;
-	}
-	public void setCacheType(short cacheType) {
-		this.cacheType = cacheType;
-	}
-	public DefaultWebSessionManager getSessionManager() {
-		return sessionManager;
-	}
-	public void setCryptoService(ShiroCryptoService cryptoService) {
-		this.cryptoService = cryptoService;
-	}
-	public DefaultWebSecurityManager getSecurityManager() {
-		return securityManager;
-	}
-	public FilterManager getFilterManager() {
-		return filterManager;
-	}
-	public SecurityManagerConfig getManagerConfig() {
-		return managerConfig;
-	}
-	public FilterChainConfig getFilterConfig() {
-		return filterConfig;
-	}
-	public ShiroFilterFactoryBean getShiroFilterFactoryBean() {
-		return shiroFilterFactoryBean;
-	}
+    protected void build() {
+        if (!initialized.getAndSet(Boolean.TRUE)) {
+            this.buildSecurityManager();
+            this.buildShiroFilterFactoryBean();
+            afterBuild();
+        }
+    }
+
+    private void afterBuild() {
+        ShiroUtils.setCryptoService(this.cryptoService);
+        ShiroUtils.setFilterManager(this.filterManager);
+        ShiroUtils.setRealmManager(this.realmManager);
+        ShiroUtils.setSessionManager(this.sessionManager);
+        ShiroUtils.setShiroCacheDelegator(this.cacheDelegator);
+        ShiroUtils.setShiroFilterFactoryBean(this.shiroFilterFactoryBean);
+        ShiroUtils.setShiroProperties(this.properties);
+    }
+
+
 }

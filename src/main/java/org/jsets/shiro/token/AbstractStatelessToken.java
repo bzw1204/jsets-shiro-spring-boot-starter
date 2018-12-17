@@ -17,53 +17,29 @@
  */
 package org.jsets.shiro.token;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * HMAC(哈希消息认证码)令牌
+ * 无状态令牌抽象
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
 @Getter
 @Setter
-public class HmacToken extends AbstractStatelessToken {
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class AbstractStatelessToken implements AuthenticationToken {
 
-    private static final long serialVersionUID = -7838912794581842158L;
+    private static final long serialVersionUID = 6655946030026745372L;
 
     /**
-     * 客户标识
+     * 客户IP
      */
-    private String appId;
-    /**
-     * 时间戳
-     */
-    private String timestamp;
-    /**
-     * 待核验字符串
-     */
-    private String baseString;
-    /**
-     * 消息摘要
-     */
-    private String digest;
+    private String host;
 
-    public HmacToken(String host, String appId, String timestamp, String baseString, String digest) {
-        super(host);
-        this.appId = appId;
-        this.timestamp = timestamp;
-        this.baseString = baseString;
-        this.digest = digest;
-    }
-
-    @Override
-    public Object getPrincipal() {
-        return this.appId;
-    }
-
-    @Override
-    public Object getCredentials() {
-        return Boolean.TRUE;
-    }
 }

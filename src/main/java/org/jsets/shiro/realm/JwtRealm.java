@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,88 +17,87 @@
  */
 package org.jsets.shiro.realm;
 
-import java.util.Map;
-import java.util.Set;
+import io.jsonwebtoken.MalformedJwtException;
+import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.jsets.shiro.config.MessageConfig;
 import org.jsets.shiro.token.JwtToken;
-import org.jsets.shiro.util.Commons;
-import io.jsonwebtoken.MalformedJwtException;
+import org.jsets.shiro.util.AbstractCommons;
+
+import java.util.Map;
+import java.util.Set;
+
+import static cn.hutool.core.util.StrUtil.DELIM_END;
+import static cn.hutool.core.util.StrUtil.DELIM_START;
+import static org.jsets.shiro.consts.EncryptionTypeConsts.JWT;
+import static org.jsets.shiro.consts.NumberConsts.FOUR;
+import static org.jsets.shiro.realm.PasswordRealm.buildAuthorizationInfo;
+
 /**
  * 基于JWT（ JSON WEB TOKEN）的控制域
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public class JwtRealm extends AuthorizingRealm{
+public class JwtRealm extends AuthorizingRealm {
 
-	private MessageConfig messages;
-	
-	@Override
-	public Class<?> getAuthenticationTokenClass() {
-		return JwtToken.class;
-	}
-	
-	/**
-	 *  认证
-	 */
-	@Override
-	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		// 只认证JwtToken
-		if(!(token instanceof JwtToken)) {
+    @Setter
+    private MessageConfig messages;
+
+    @Override
+    public Class<?> getAuthenticationTokenClass() {
+        return JwtToken.class;
+    }
+
+    /**
+     * 认证
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        // 只认证JwtToken
+        if (!(token instanceof JwtToken)) {
             return null;
         }
-		String jwt = ((JwtToken)token).getJwt();
-		String payload = null;
-		try{
-			// 预先解析Payload
-			// 没有做任何的签名校验
-			 payload = Commons.parseJwtPayload(jwt);
-		} catch(MalformedJwtException e){
-			throw new AuthenticationException(this.messages.getMsgJwtMalformed());
-		} catch(Exception e){
-			throw new AuthenticationException(this.messages.getMsgJwtError());
-		}
-		if(null == payload){
-			throw new AuthenticationException(this.messages.getMsgJwtError());
-		}
-		return new SimpleAuthenticationInfo("jwt:"+payload,jwt,this.getName());
-	}
-	
-	/** 
-     * 授权 
-     */  
-	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		
-		String payload = (String) principals.getPrimaryPrincipal();
-		// likely to be json, parse it:
-		if (payload.startsWith("jwt:") && payload.charAt(4) == '{' 
-									   && payload.charAt(payload.length() - 1) == '}') { 
+        String jwt = ((JwtToken) token).getJwt();
+        String payload = null;
+        try {
+            // 预先解析Payload
+            // 没有做任何的签名校验
+            payload = AbstractCommons.parseJwtPayload(jwt);
+        } catch (MalformedJwtException e) {
+            throw new AuthenticationException(this.messages.getMsgJwtMalformed());
+        } catch (Exception e) {
+            throw new AuthenticationException(this.messages.getMsgJwtError());
+        }
+        if (null == payload) {
+            throw new AuthenticationException(this.messages.getMsgJwtError());
+        }
+        return new SimpleAuthenticationInfo("jwt:" + payload, jwt, this.getName());
+    }
 
-            Map<String, Object> payloadMap = Commons.readValue(payload.substring(4));
-    		Set<String> roles = Commons.split((String)payloadMap.get("roles"));
-    		Set<String> permissions = Commons.split((String)payloadMap.get("perms"));
-    		SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
-    		if(null!=roles&&!roles.isEmpty()) {
-                info.setRoles(roles);
-            }
-    		if(null!=permissions&&!permissions.isEmpty()) {
-                info.setStringPermissions(permissions);
-            }
-    		 return info;
+    /**
+     * 授权
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+
+        String payload = (String) principals.getPrimaryPrincipal();
+        // likely to be json, parse it:
+
+        boolean isJwt = payload.startsWith(JWT) && DELIM_START.equals(payload.charAt(FOUR)) && DELIM_END.equals(payload.charAt(payload.length() - 1));
+        if (isJwt) {
+
+            Map<String, Object> payloadMap = AbstractCommons.readValue(payload.substring(4));
+            Set<String> roles = AbstractCommons.split((String) payloadMap.get("roles"));
+            Set<String> permissions = AbstractCommons.split((String) payloadMap.get("perms"));
+            return buildAuthorizationInfo(roles, permissions);
         }
         return null;
-	}
-
-	public void setMessages(MessageConfig messages) {
-		this.messages = messages;
-	}
+    }
 }

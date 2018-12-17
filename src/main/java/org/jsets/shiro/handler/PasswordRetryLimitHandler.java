@@ -15,37 +15,20 @@
  * limitations under the License.
  * </p>
  */
-package org.jsets.shiro.token;
-
-import lombok.Getter;
-import lombok.Setter;
+package org.jsets.shiro.handler;
 
 /**
- * JWT(json web token)令牌
+ * 密码连续错误次数超限处理器接口
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@Getter
-@Setter
-public class JwtToken extends AbstractStatelessToken {
+public interface PasswordRetryLimitHandler {
 
-    private static final long serialVersionUID = 1832943548774576547L;
-
-    private String jwt;
-
-    public JwtToken(String host, String jwt) {
-        super(host);
-        this.jwt = jwt;
-    }
-
-    @Override
-    public Object getPrincipal() {
-        return this.jwt;
-    }
-
-    @Override
-    public Object getCredentials() {
-        return Boolean.TRUE;
-    }
+    /**
+     * 拦截器
+     *
+     * @param account
+     */
+    void handle(String account);
 }

@@ -56,6 +56,9 @@ public class JCaptchaUtil {
 
     /**
      * 生成验证码
+     *
+     * @param request
+     * @return
      */
     public static BufferedImage generateCaptcha(HttpServletRequest request) {
         return jcaptchaService().getImageChallengeForID(request.getSession(true).getId());
@@ -63,6 +66,10 @@ public class JCaptchaUtil {
 
     /**
      * 验证码校验
+     *
+     * @param request
+     * @param jcaptcha 待校验的验证码
+     * @return
      */
     public static boolean validateCaptcha(HttpServletRequest request, String jcaptcha) {
         try {

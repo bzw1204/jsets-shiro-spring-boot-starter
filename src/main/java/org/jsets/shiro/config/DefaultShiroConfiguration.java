@@ -17,8 +17,8 @@
  */
 package org.jsets.shiro.config;
 
-import org.jsets.shiro.service.DefaultAccountProvider;
-import org.jsets.shiro.service.ShiroCryptoService;
+import org.jsets.shiro.service.impl.DefaultAccountProvider;
+import org.jsets.shiro.service.impl.ShiroCryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +29,8 @@ import org.springframework.context.annotation.Configuration;
  * @date 2016年6月31日
  */
 @Configuration
-@ConditionalOnMissingBean(JsetsShiroConfigurationAdapter.class)
-public class DefaultShiroConfiguration extends JsetsShiroConfigurationAdapter{
+@ConditionalOnMissingBean(AbstractShiroConfigurationAdapter.class)
+public class DefaultShiroConfiguration extends AbstractShiroConfigurationAdapter{
 
 	@Autowired
 	private ShiroCryptoService shiroCryptoService;

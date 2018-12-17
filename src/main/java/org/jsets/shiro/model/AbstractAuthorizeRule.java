@@ -15,37 +15,39 @@
  * limitations under the License.
  * </p>
  */
-package org.jsets.shiro.token;
+package org.jsets.shiro.model;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
- * JWT(json web token)令牌
+ * 权限验证规则
  *
- * @author wangjie (https://github.com/wj596)
+ * @author wangjie
  * @date 2016年6月31日
  */
-@Getter
-@Setter
-public class JwtToken extends AbstractStatelessToken {
+public abstract class AbstractAuthorizeRule implements Serializable {
 
-    private static final long serialVersionUID = 1832943548774576547L;
+    private static final long serialVersionUID = 1L;
 
-    private String jwt;
+    public static final short RULE_TYPE_DEF = 1;
+    public static final short RULE_TYPE_HMAC = 2;
+    public static final short RULE_TYPE_JWT = 3;
+    public static final short RULE_TYPE_CUSTOM = 4;
 
-    public JwtToken(String host, String jwt) {
-        super(host);
-        this.jwt = jwt;
-    }
+    /**
+     * 规则类型
+     */
+    @Setter
+    @Getter
+    private short type;
 
-    @Override
-    public Object getPrincipal() {
-        return this.jwt;
-    }
-
-    @Override
-    public Object getCredentials() {
-        return Boolean.TRUE;
-    }
+    /**
+     * 转过滤器链
+     *
+     * @return
+     */
+    public abstract StringBuilder toFilterChain();
 }

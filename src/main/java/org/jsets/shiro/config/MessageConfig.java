@@ -28,7 +28,6 @@ public class MessageConfig {
     private MessageConfig() {
     }
 
-    ;
 
     private static class MessagesHolder {
         private static MessageConfig MESSAGES = new MessageConfig();

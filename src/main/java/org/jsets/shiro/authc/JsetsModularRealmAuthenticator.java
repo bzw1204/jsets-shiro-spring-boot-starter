@@ -1,6 +1,6 @@
 /*
  * Copyright 2017-2018 the original author(https://github.com/wj596)
- * 
+ *
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@
 package org.jsets.shiro.authc;
 
 import java.util.List;
+
 import static java.util.stream.Collectors.*;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -28,30 +30,22 @@ import org.apache.shiro.util.CollectionUtils;
 
 /**
  * 扩展自ModularRealmAuthenticator,认证开始先过滤掉不支持token类型的realm
- * 
+ *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
 public class JsetsModularRealmAuthenticator extends ModularRealmAuthenticator {
 
-	@Override
-	protected AuthenticationInfo doAuthenticate(AuthenticationToken authenticationToken) throws AuthenticationException {
-		assertRealmsConfigured();
-		List<Realm> realms = this.getRealms()
-			.stream()
-			.filter(realm -> {
-					return realm.supports(authenticationToken);
-			})
-			.collect(toList());
-		if (CollectionUtils.isEmpty(realms)) {
+    @Override
+    protected AuthenticationInfo doAuthenticate(AuthenticationToken authenticationToken) throws AuthenticationException {
+        assertRealmsConfigured();
+        List<Realm> realms = this.getRealms().stream().filter(realm -> realm.supports(authenticationToken)).collect(toList());
+        if (CollectionUtils.isEmpty(realms)) {
             throw new IllegalStateException("Configuration error:  No realms support token type:" + authenticationToken.getClass());
         }
-		
-		if (realms.size() == 1) {
-			return doSingleRealmAuthentication(realms.iterator().next(), authenticationToken);
-		} else {
-			return doMultiRealmAuthentication(realms, authenticationToken);
-		}
-	}
-	
+
+        return realms.size() == 1 ? doSingleRealmAuthentication(realms.iterator().next(), authenticationToken)
+                : doMultiRealmAuthentication(realms, authenticationToken);
+    }
+
 }

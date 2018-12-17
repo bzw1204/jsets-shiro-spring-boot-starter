@@ -17,35 +17,31 @@
  */
 package org.jsets.shiro.model;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * 默认账号实现
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class DefaultAccount implements Account {
 
     private static final long serialVersionUID = 4329526398056888883L;
 
+    @Setter
     private String account;
+    @Setter
     private String password;
 
-    public DefaultAccount(String account, String password) {
-        this.account = account;
-        this.password = password;
-    }
 
     @Override
     public String getAccount() {
         return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override

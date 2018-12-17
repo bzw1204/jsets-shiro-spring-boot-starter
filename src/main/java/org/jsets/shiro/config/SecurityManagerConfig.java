@@ -18,12 +18,15 @@
 package org.jsets.shiro.config;
 
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.SimpleCookie;
-import org.jsets.shiro.handler.PasswdRetryLimitHandler;
+import org.jsets.shiro.handler.PasswordRetryLimitHandler;
 import org.jsets.shiro.service.ShiroAccountProvider;
 import org.jsets.shiro.service.ShiroStatelessAccountProvider;
 
@@ -35,50 +38,24 @@ import java.util.List;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@Setter
+@Getter
+@NoArgsConstructor
 public class SecurityManagerConfig {
 
+    /**
+     * 账号信息提供者
+     */
     private ShiroAccountProvider accountProvider;
-    private ShiroStatelessAccountProvider statelessAccountProvider;
-    private PasswdRetryLimitHandler passwdRetryLimitHandler;
-    private SimpleCookie rememberMeCookie;
-    private SessionDAO sessionDAO;
-    private CacheManager cacheManager;
-    private final List<SessionListener> sessionListeners = Lists.newLinkedList();
-    private final List<Realm> realms = Lists.newLinkedList();
-    private final MessageConfig messages = MessageConfig.ins();
-
-    protected SecurityManagerConfig() {
-    }
-
-    ;
-
-    /**
-     * 设置账号信息提供者
-     *
-     * @param accountProviderImpl see org.jsets.shiro.service.ShiroAccountProvider
-     */
-    public void setAccountProvider(ShiroAccountProvider accountProviderImpl) {
-        this.accountProvider = accountProviderImpl;
-    }
-
-    /**
-     * 设置密码错误次数超限处理器
-     *
-     * @param passwdRetryLimitHandlerImpl see org.jsets.shiro.service.PasswdRetryLimitHandler
-     */
-    public void setPasswdRetryLimitHandler(PasswdRetryLimitHandler passwdRetryLimitHandlerImpl) {
-        this.passwdRetryLimitHandler = passwdRetryLimitHandlerImpl;
-    }
-
     /**
      * 设置无状态鉴权(HMAC、JWT)账号信息提供者
      * <br>如果不设置此项无状态鉴权默认使用accountProviderImpl作为账号信息提供者
-     *
-     * @param statelessAccountProviderImpl see org.jsets.shiro.service.ShiroStatelessAccountProvider
      */
-    public void setStatelessAccountProvider(ShiroStatelessAccountProvider statelessAccountProviderImpl) {
-        this.statelessAccountProvider = statelessAccountProviderImpl;
-    }
+    private ShiroStatelessAccountProvider statelessAccountProvider;
+    /**
+     * 密码错误次数超限处理器
+     */
+    private PasswordRetryLimitHandler passwordRetryLimitHandler;
 
     /**
      * 设置RememberMe  Cookie的模板
@@ -86,84 +63,37 @@ public class SecurityManagerConfig {
      *
      * @param rememberMeCookie see org.apache.shiro.web.servlet.SimpleCookie
      */
-    public void setRememberMeCookie(SimpleCookie rememberMeCookie) {
-        this.rememberMeCookie = rememberMeCookie;
-    }
-
+    private SimpleCookie rememberMeCookie;
     /**
      * 设置SessionDAO
      * <br>如果组件提供的session缓存方式(内存、ehcache、redis)无法满足需求，可设置此项定制session持久化
      *
      * @param sessionDAO see org.apache.shiro.session.mgt.eis.SessionDAO
      */
-    public void setSessionDAO(SessionDAO sessionDAO) {
-        this.sessionDAO = sessionDAO;
-    }
-
+    private SessionDAO sessionDAO;
     /**
-     * 设置SessionDAO
+     * 设置CacheManager
      * <br>如果组件提供的缓存方式(内存、ehcache、redis)无法满足需求，可设置此项定制缓存实现
      *
      * @param cacheManager see org.apache.shiro.cache.CacheManager
      */
-    public void setCacheManager(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
+    private CacheManager cacheManager;
+    private final List<SessionListener> sessionListeners = Lists.newLinkedList();
+    private final List<Realm> realms = Lists.newLinkedList();
+    private final MessageConfig messages = MessageConfig.ins();
 
     /**
      * 添加鉴权控制域
      * <br>组件中提供三个控制域
-     * <br>PasswdRealm:有状态用户名,密码鉴权控制域
+     * <br>PasswordRealm:有状态用户名,密码鉴权控制域
      * <br>HmacRealm:无状态hmac签名鉴权控制域
      * <br>JwtRealm:无状态jwt令牌鉴权控制域
      * <br>如果无法满足需求，可设置此项添加鉴权控制域
      *
-     * @param cacheManager see org.apache.shiro.cache.CacheManager
+     * @param realm
      */
     public void addRealm(Realm realm) {
         this.realms.add(realm);
     }
 
-    /**
-     * 获取提示消息配置，以便根据需要修改提示消息
-     */
-    public MessageConfig getMessages() {
-        return messages;
-    }
-
-    protected ShiroAccountProvider getAccountProvider() {
-        return accountProvider;
-    }
-
-    protected ShiroStatelessAccountProvider getStatelessAccountProvider() {
-        return statelessAccountProvider;
-    }
-
-    protected PasswdRetryLimitHandler getPasswdRetryLimitHandler() {
-        return passwdRetryLimitHandler;
-    }
-
-    protected SimpleCookie getRememberMeCookie() {
-        return rememberMeCookie;
-    }
-
-    protected SessionDAO getSessionDAO() {
-        return sessionDAO;
-    }
-
-    protected CacheManager getCacheManager() {
-        return cacheManager;
-    }
-
-    protected void addSessionListener(SessionListener sessionListener) {
-        this.sessionListeners.add(sessionListener);
-    }
-
-    protected List<SessionListener> getSessionListeners() {
-        return sessionListeners;
-    }
-
-    protected List<Realm> getRealms() {
-        return this.realms;
-    }
 }

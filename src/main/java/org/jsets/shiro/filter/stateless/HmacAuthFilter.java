@@ -31,33 +31,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 基于JWT(JSON WEB TOKEN)的无状态过滤器--角色验证过滤器
+ * 基于HMAC（ 散列消息认证码）的无状态认证过滤器--认证
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public class JwtRolesFilter extends AbstractStatelessFilter {
+public class HmacAuthFilter extends AbstractStatelessFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtRolesFilter.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HmacAuthFilter.class);
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = getSubject(request, response);
-        boolean authenticated = (null == subject || !subject.isAuthenticated()) && isJwtSubmission(request);
-        if (authenticated) {
-            AuthenticationToken token = createJwtToken(request, response);
+        if (null != subject && subject.isAuthenticated()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        if (isHmacSubmission(request)) {
+            AuthenticationToken token = createHmacToken(request, response);
             try {
-                subject = getSubject(request, response);
+                Subject subject = getSubject(request, response);
                 subject.login(token);
-                return this.checkRoles(subject, mappedValue);
+                return true;
             } catch (AuthenticationException e) {
-                LOGGER.error(request.getRemoteHost() + " JWT鉴权  " + e.getMessage());
+                LOGGER.error(request.getRemoteHost() + " HMAC认证  " + e.getMessage());
                 AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
             }
         }
         return false;
     }
-
 
 }

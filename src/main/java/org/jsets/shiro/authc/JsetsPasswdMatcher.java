@@ -17,6 +17,7 @@
  */
 package org.jsets.shiro.authc;
 
+import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -24,8 +25,8 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.jsets.shiro.cache.CacheDelegator;
 import org.jsets.shiro.config.MessageConfig;
 import org.jsets.shiro.config.ShiroProperties;
-import org.jsets.shiro.handler.PasswdRetryLimitHandler;
-import org.jsets.shiro.service.ShiroCryptoService;
+import org.jsets.shiro.handler.PasswordRetryLimitHandler;
+import org.jsets.shiro.service.impl.ShiroCryptoService;
 
 /**
  * 密码匹配器
@@ -33,11 +34,12 @@ import org.jsets.shiro.service.ShiroCryptoService;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@Setter
 public class JsetsPasswdMatcher implements CredentialsMatcher {
 
     private ShiroProperties properties;
     private MessageConfig messages;
-    private PasswdRetryLimitHandler passwdRetryLimitHandler;
+    private PasswordRetryLimitHandler passwordRetryLimitHandler;
     private CacheDelegator cacheDelegator;
     private ShiroCryptoService cryptoService;
 
@@ -48,42 +50,22 @@ public class JsetsPasswdMatcher implements CredentialsMatcher {
         String password = (String) info.getCredentials();
         String encrypted = this.cryptoService.password(credentials);
         if (!password.equals(encrypted)) {
-            int passwdMaxRetries = this.properties.getPasswdMaxRetries();
+            int passwordMaxRetries = this.properties.getPasswdMaxRetries();
             String errorMsg = this.messages.getMsgAccountPasswordError();
-            if (passwdMaxRetries > 0 && null != this.passwdRetryLimitHandler) {
+            if (passwordMaxRetries > 0 && null != this.passwordRetryLimitHandler) {
                 errorMsg = this.messages.getMsgPasswordRetryError();
-                int passwdRetries = this.cacheDelegator.incPasswdRetryCount(account);
-                if (passwdRetries >= passwdMaxRetries - 1) {
-                    this.passwdRetryLimitHandler.handle(account);
+                int passwordRetries = this.cacheDelegator.incPasswordRetryCount(account);
+                if (passwordRetries >= passwordMaxRetries - 1) {
+                    this.passwordRetryLimitHandler.handle(account);
                 }
-                int remain = passwdMaxRetries - passwdRetries;
-                errorMsg = errorMsg.replace("{total}", String.valueOf(passwdMaxRetries))
+                int remain = passwordMaxRetries - passwordRetries;
+                errorMsg = errorMsg.replace("{total}", String.valueOf(passwordMaxRetries))
                         .replace("{remain}", String.valueOf(remain));
             }
             throw new AuthenticationException(errorMsg);
         }
-        this.cacheDelegator.cleanPasswdRetryCount(account);
+        this.cacheDelegator.cleanPasswordRetryCount(account);
         return true;
-    }
-
-    public void setProperties(ShiroProperties properties) {
-        this.properties = properties;
-    }
-
-    public void setCacheDelegator(CacheDelegator cacheDelegator) {
-        this.cacheDelegator = cacheDelegator;
-    }
-
-    public void setCryptoService(ShiroCryptoService cryptoService) {
-        this.cryptoService = cryptoService;
-    }
-
-    public void setMessages(MessageConfig messages) {
-        this.messages = messages;
-    }
-
-    public void setPasswdRetryLimitHandler(PasswdRetryLimitHandler passwdRetryLimitHandler) {
-        this.passwdRetryLimitHandler = passwdRetryLimitHandler;
     }
 
 }

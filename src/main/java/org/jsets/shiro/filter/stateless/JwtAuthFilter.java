@@ -24,6 +24,7 @@ import cn.hutool.http.HttpStatus;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.jsets.shiro.config.MessageConfig;
 import org.jsets.shiro.util.AbstractCommons;
@@ -31,33 +32,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 基于JWT(JSON WEB TOKEN)的无状态过滤器--角色验证过滤器
+ * 基于JWT(JSON WEB TOKEN)的无状态过滤器--认证
  *
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-public class JwtRolesFilter extends AbstractStatelessFilter {
+public class JwtAuthFilter extends AbstractStatelessFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtRolesFilter.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessControlFilter.class);
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        Subject subject = getSubject(request, response);
-        boolean authenticated = (null == subject || !subject.isAuthenticated()) && isJwtSubmission(request);
-        if (authenticated) {
-            AuthenticationToken token = createJwtToken(request, response);
-            try {
-                subject = getSubject(request, response);
-                subject.login(token);
-                return this.checkRoles(subject, mappedValue);
-            } catch (AuthenticationException e) {
-                LOGGER.error(request.getRemoteHost() + " JWT鉴权  " + e.getMessage());
-                AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
-            }
+        if (null != getSubject(request, response)
+                && getSubject(request, response).isAuthenticated()) {
+            return true;
         }
         return false;
     }
 
-
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        if (isJwtSubmission(request)) {
+            AuthenticationToken token = createJwtToken(request, response);
+            try {
+                Subject subject = getSubject(request, response);
+                subject.login(token);
+                return true;
+            } catch (AuthenticationException e) {
+                LOGGER.error(request.getRemoteHost() + " JWT认证  " + e.getMessage());
+                AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
+            }
+        }
+        AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
+        return false;
+    }
 }

@@ -6,7 +6,7 @@
     <version>1.0.2</version>
 
     <properties>
-        <spring-boot.version>1.5.3.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
         <spring-data-redis.version>1.8.3.RELEASE</spring-data-redis.version>
         <shiro.version>1.4.0</shiro.version>
         <jjwt.version>0.9.0</jjwt.version>
@@ -70,6 +70,18 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>4.1.18</version>
         </dependency>
     </dependencies>
 

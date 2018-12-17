@@ -18,8 +18,8 @@
 package org.jsets.shiro.config;
 
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
-import org.jsets.shiro.service.ShiroCryptoService;
-import org.jsets.shiro.service.ShiroSecurityService;
+import org.jsets.shiro.service.impl.ShiroCryptoService;
+import org.jsets.shiro.service.impl.ShiroSecurityService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
