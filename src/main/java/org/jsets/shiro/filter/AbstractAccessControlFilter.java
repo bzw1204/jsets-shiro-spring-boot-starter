@@ -11,6 +11,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_UNAUTHORIZED;
+
 /**
  * @author: 白振伟
  * @create: 2018年12月17日 19:58:02
@@ -27,12 +29,12 @@ public abstract class AbstractAccessControlFilter extends AccessControlFilter {
             AbstractCommons.ajaxFailed(WebUtils.toHttp(response)
                     , HttpServletResponse.SC_UNAUTHORIZED
                     , HttpStatus.HTTP_UNAUTHORIZED
-                    , MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
+                    , REST_MESSAGE_AUTH_UNAUTHORIZED);
             // 过滤器链停止
-            return false;
+            return Boolean.FALSE;
         }
         saveRequestAndRedirectToLogin(request, response);
-        return false;
+        return Boolean.FALSE;
     }
 
     /**
@@ -40,7 +42,7 @@ public abstract class AbstractAccessControlFilter extends AccessControlFilter {
      */
     protected boolean respondRedirect(ServletRequest request, ServletResponse response, String redirectUrl) throws IOException {
         WebUtils.issueRedirect(request, response, redirectUrl);
-        return false;
+        return Boolean.FALSE;
     }
 
 }

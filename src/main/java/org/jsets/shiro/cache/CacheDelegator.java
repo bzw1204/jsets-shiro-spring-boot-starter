@@ -24,7 +24,7 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.jsets.shiro.config.ShiroProperties;
-import org.jsets.shiro.util.Commons;
+import org.jsets.shiro.util.AbstractCommons;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -97,14 +97,14 @@ public class CacheDelegator {
      * 是否销毁的token
      */
     public boolean cutBurnedToken(String token) {
-        if (Commons.CACHE_TYPE_MAP == this.cacheType) {
+        if (AbstractCommons.CACHE_TYPE_MAP == this.cacheType) {
             return false;
         }
         Cache<String, Integer> cache = this.cacheManager.getCache(ShiroProperties.CACHE_NAME_TOKEN_BURNERS);
         Integer burned = cache.get(token);
         if (null == burned) {
             cache.put(token, Integer.valueOf(0));
-            if (Commons.CACHE_TYPE_REDIS == this.cacheType) {
+            if (AbstractCommons.CACHE_TYPE_REDIS == this.cacheType) {
                 RedisCacheManager redisCacheManager = (RedisCacheManager) cacheManager;
                 redisCacheManager.setRedisTimeout(ShiroProperties.CACHE_NAME_TOKEN_BURNERS, 86400L);
             }

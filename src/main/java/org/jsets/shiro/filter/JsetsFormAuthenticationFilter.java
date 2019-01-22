@@ -5,6 +5,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import cn.hutool.http.HttpStatus;
+import lombok.Setter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_SUCCEED;
+
 /**
  * @author: 白振伟
  * @create: 2018年12月17日 19:58:40
@@ -29,7 +32,9 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsetsFormAuthenticationFilter.class);
 
+    @Setter
     private ShiroProperties properties;
+    @Setter
     private MessageConfig messages;
 
 
@@ -81,7 +86,7 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
         if (AbstractCommons.isAjax(WebUtils.toHttp(request))) {
             AbstractCommons.ajaxSucceed(WebUtils.toHttp(response)
-                    , HttpStatus.HTTP_UNAUTHORIZED, MessageConfig.REST_MESSAGE_AUTH_SUCCEED);
+                    , HttpStatus.HTTP_UNAUTHORIZED, REST_MESSAGE_AUTH_SUCCEED);
         } else {
             issueSuccessRedirect(request, response);
         }
@@ -111,14 +116,6 @@ public class JsetsFormAuthenticationFilter extends FormAuthenticationFilter {
         }
         AbstractCommons.setAuthMessage(request, message);
         return true;
-    }
-
-    public void setProperties(ShiroProperties properties) {
-        this.properties = properties;
-    }
-
-    public void setMessages(MessageConfig messages) {
-        this.messages = messages;
     }
 
 }

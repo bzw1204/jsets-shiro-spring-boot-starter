@@ -65,7 +65,7 @@ public class JwtRealm extends AuthorizingRealm {
             return null;
         }
         String jwt = ((JwtToken) token).getJwt();
-        String payload = null;
+        String payload;
         try {
             // 预先解析Payload
             // 没有做任何的签名校验

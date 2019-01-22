@@ -35,6 +35,9 @@ import org.jsets.shiro.util.AbstractCommons;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.jsets.shiro.consts.MessageConsts.MSG_BURNED_TOKEN;
+import static org.jsets.shiro.consts.MessageConsts.MSG_NO_SECRET_KEY;
+
 /**
  * HMAC签名匹配器
  *
@@ -57,12 +60,12 @@ public class JsetsHmacMatcher implements CredentialsMatcher {
         String digest = (String) info.getCredentials();
         String serverDigest = null;
         if (this.properties.isHmacBurnEnabled() && this.cacheDelegator.cutBurnedToken(digest)) {
-            throw new AuthenticationException(MessageConfig.MSG_BURNED_TOKEN);
+            throw new AuthenticationException(MSG_BURNED_TOKEN);
         }
         if (AbstractCommons.hasLen(this.properties.getHmacSecretKey())) {
             serverDigest = this.cryptoService.hmacDigest(hmacToken.getBaseString());
         } else {
-            String appKey = Optional.ofNullable(accountProvider.loadAppKey(appId)).orElseThrow(() -> new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY));
+            String appKey = Optional.ofNullable(accountProvider.loadAppKey(appId)).orElseThrow(() -> new AuthenticationException(MSG_NO_SECRET_KEY));
             serverDigest = this.cryptoService.hmacDigest(hmacToken.getBaseString(), appKey);
         }
 

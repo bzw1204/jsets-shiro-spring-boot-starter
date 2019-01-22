@@ -43,10 +43,7 @@ public class HmacAuthFilter extends AbstractStatelessFilter {
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = getSubject(request, response);
-        if (null != subject && subject.isAuthenticated()) {
-            return true;
-        }
-        return false;
+        return null != subject && subject.isAuthenticated();
     }
 
     @Override
@@ -56,13 +53,13 @@ public class HmacAuthFilter extends AbstractStatelessFilter {
             try {
                 Subject subject = getSubject(request, response);
                 subject.login(token);
-                return true;
+                return Boolean.TRUE;
             } catch (AuthenticationException e) {
                 LOGGER.error(request.getRemoteHost() + " HMAC认证  " + e.getMessage());
                 AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
 }

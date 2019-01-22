@@ -33,16 +33,16 @@ public interface ShiroAccountProvider {
     /**
      * 根据用户名获取账号信息
      *
-     * @param account
+     * @param account 账号
      * @return 账号信如果查找不到用户返回null或者直接抛出AuthenticationException
-     * @throws AuthenticationException
+     * @throws AuthenticationException 认证异常
      */
     Account loadAccount(String account) throws AuthenticationException;
 
     /**
      * 根据用户名称加载用户所有的角色
      *
-     * @param account
+     * @param account 用户名称
      * @return 角色列表
      */
     Set<String> loadRoles(String account);
@@ -50,7 +50,7 @@ public interface ShiroAccountProvider {
     /**
      * 根据用户名称加载用户所有的权限
      *
-     * @param account
+     * @param account 用户名称
      * @return 权限列表
      */
     Set<String> loadPermissions(String account);

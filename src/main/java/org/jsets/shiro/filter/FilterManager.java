@@ -17,6 +17,7 @@
  */
 package org.jsets.shiro.filter;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -180,7 +181,7 @@ public class FilterManager {
             return;
         }
         List<RolePermRule> rolePermRules = this.rulesProvider.loadRolePermRules();
-        if (null != rolePermRules) {
+        if (CollectionUtil.isNotEmpty(rolePermRules)) {
             rolePermRules.forEach(rule -> {
                 rule.setType(AbstractAuthorizeRule.RULE_TYPE_DEF);
                 StringBuilder filterChain = rule.toFilterChain();
@@ -192,7 +193,7 @@ public class FilterManager {
         }
 
         List<RolePermRule> hmacRules = this.rulesProvider.loadHmacRules();
-        if (null != hmacRules) {
+        if (CollectionUtil.isNotEmpty(hmacRules)) {
             hmacRules.forEach(rule -> {
                 rule.setType(AbstractAuthorizeRule.RULE_TYPE_HMAC);
                 StringBuilder filterChain = rule.toFilterChain();
@@ -203,7 +204,7 @@ public class FilterManager {
         }
 
         List<RolePermRule> jwtRules = this.rulesProvider.loadJwtRules();
-        if (null != jwtRules) {
+        if (CollectionUtil.isNotEmpty(jwtRules)) {
             jwtRules.forEach(rule -> {
                 rule.setType(AbstractAuthorizeRule.RULE_TYPE_JWT);
                 StringBuilder filterChain = rule.toFilterChain();
@@ -214,7 +215,7 @@ public class FilterManager {
         }
 
         List<CustomRule> customRules = this.rulesProvider.loadCustomRules();
-        if (null != customRules) {
+        if (CollectionUtil.isNotEmpty(customRules)) {
             customRules.forEach(rule -> {
                 rule.setType(AbstractAuthorizeRule.RULE_TYPE_CUSTOM);
                 StringBuilder filterChain = rule.toFilterChain();

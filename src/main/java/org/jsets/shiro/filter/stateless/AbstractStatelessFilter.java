@@ -38,6 +38,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_FORBIDDEN;
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_UNAUTHORIZED;
+
 /**
  * 无状态过滤器--抽象父类
  *
@@ -98,7 +101,7 @@ public abstract class AbstractStatelessFilter extends AccessControlFilter {
         if (rolesArray == null || rolesArray.length == 0) {
             return true;
         }
-        return Stream.of(rolesArray).anyMatch(role -> subject.hasRole(role));
+        return Stream.of(rolesArray).anyMatch(subject::hasRole);
     }
 
     protected boolean checkPerms(Subject subject, Object mappedValue) {
@@ -116,10 +119,10 @@ public abstract class AbstractStatelessFilter extends AccessControlFilter {
         Subject subject = getSubject(request, response);
         //未认证
         if (null == subject || !subject.isAuthenticated()) {
-            AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
+            AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, REST_MESSAGE_AUTH_UNAUTHORIZED);
             //未授权
         } else {
-            AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, MessageConfig.REST_MESSAGE_AUTH_FORBIDDEN);
+            AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, REST_MESSAGE_AUTH_FORBIDDEN);
         }
         return false;
     }

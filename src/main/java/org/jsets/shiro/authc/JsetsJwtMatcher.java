@@ -33,6 +33,9 @@ import org.jsets.shiro.service.ShiroStatelessAccountProvider;
 import org.jsets.shiro.service.impl.ShiroCryptoService;
 import org.jsets.shiro.util.AbstractCommons;
 
+import static org.jsets.shiro.consts.MessageConsts.MSG_BURNED_TOKEN;
+import static org.jsets.shiro.consts.MessageConsts.MSG_NO_SECRET_KEY;
+
 /**
  * JWT匹配器
  *
@@ -59,7 +62,7 @@ public class JsetsJwtMatcher implements CredentialsMatcher {
                 String appId = (String) AbstractCommons.readValue(AbstractCommons.parseJwtPayload(jwt)).get("subject");
                 String appKey = accountProvider.loadAppKey(appId);
                 if (Strings.isNullOrEmpty(appKey)) {
-                    throw new AuthenticationException(MessageConfig.MSG_NO_SECRET_KEY);
+                    throw new AuthenticationException(MSG_NO_SECRET_KEY);
                 }
                 statelessAccount = this.cryptoService.parseJwt(jwt, appKey);
             }
@@ -77,7 +80,7 @@ public class JsetsJwtMatcher implements CredentialsMatcher {
         String tokenId = statelessAccount.getTokenId();
         if (this.properties.isJwtBurnEnabled()
                 && this.cacheDelegator.cutBurnedToken(tokenId)) {
-            throw new AuthenticationException(MessageConfig.MSG_BURNED_TOKEN);
+            throw new AuthenticationException(MSG_BURNED_TOKEN);
         }
         return true;
     }

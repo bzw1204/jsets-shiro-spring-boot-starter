@@ -156,8 +156,7 @@ public class JsetsShiroManager {
             org.springframework.cache.CacheManager springCacheManager =
                     listableBeanFactory.getBean(org.springframework.cache.CacheManager.class);
             // EhCache
-            if (null != springCacheManager
-                    && springCacheManager instanceof org.springframework.cache.ehcache.EhCacheCacheManager) {
+            if (springCacheManager instanceof org.springframework.cache.ehcache.EhCacheCacheManager) {
                 EhCacheManager ehCacheManager = new EhCacheManager();
                 ehCacheManager.setCacheManager(((org.springframework.cache.ehcache.EhCacheCacheManager) springCacheManager).getCacheManager());
                 this.setCacheType(AbstractCommons.CACHE_TYPE_EHCACHE);
@@ -165,8 +164,7 @@ public class JsetsShiroManager {
                 return;
             }
             // Redis
-            if (null != springCacheManager
-                    && springCacheManager instanceof org.springframework.data.redis.cache.RedisCacheManager) {
+            if (springCacheManager instanceof org.springframework.data.redis.cache.RedisCacheManager) {
                 RedisConnectionFactory redisConnectionFactory = this.beanFactory.getBean(RedisConnectionFactory.class);
                 GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
                 RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
@@ -255,7 +253,7 @@ public class JsetsShiroManager {
         filterManager.setCacheDelegator(this.cacheDelegator);
         filterManager.setAccountProvider(this.managerConfig.getAccountProvider());
         filterManager.setCustomFilters(this.filterConfig.getFilters());
-        filterManager.setRulesProvider(this.filterConfig.getShiroFilteRulesProvider());
+        filterManager.setRulesProvider(this.filterConfig.getShiroFilterRulesProvider());
         filterManager.setMessages(MessageConfig.ins());
         filterManager.initFixations();
         filterManager.initFilters();

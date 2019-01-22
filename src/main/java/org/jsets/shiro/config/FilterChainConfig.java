@@ -18,11 +18,15 @@
 package org.jsets.shiro.config;
 
 
-import java.util.Map;
-import javax.servlet.Filter;
-
-import org.jsets.shiro.service.ShiroFilteRulesProvider;
 import com.google.common.collect.Maps;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.jsets.shiro.service.ShiroFilteRulesProvider;
+
+import javax.servlet.Filter;
+import java.util.Map;
 
 /**
  * shiro 过滤器链配置
@@ -30,23 +34,18 @@ import com.google.common.collect.Maps;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FilterChainConfig {
 
+    @Getter
     private final Map<String, Filter> filters = Maps.newLinkedHashMap();
-    private ShiroFilteRulesProvider shiroFilteRulesProvider;
-
-    protected FilterChainConfig() {
-    }
 
     /**
      * 设置过滤规则提供者，实现动态URL鉴权过滤
-     *
-     * @param shiroFilteRulesProvider
-     * @see org.jsets.shiro.service.ShiroFilteRulesProvider
      */
-    public void setShiroFilteRulesProvider(ShiroFilteRulesProvider shiroFilteRulesProvider) {
-        this.shiroFilteRulesProvider = shiroFilteRulesProvider;
-    }
+    @Getter
+    @Setter
+    private ShiroFilteRulesProvider shiroFilterRulesProvider;
 
     /**
      * 添加鉴权过滤
@@ -54,7 +53,7 @@ public class FilterChainConfig {
      * <br>authc:基于表单的登陆过滤器
      * <br>roles:基于角色的验证过滤器
      * <br>perms:基于权限的验证过滤器
-     * <br>user:断言seesion中存在用户的过滤器
+     * <br>user:断言session中存在用户的过滤器
      * <br>keepOne:账号唯一用户登陆过滤器
      * <br>forceLogout:强制用户下线过滤器
      * <br>hmac:hmac数字签名认证过滤器
@@ -69,11 +68,4 @@ public class FilterChainConfig {
         this.filters.put(name, filter);
     }
 
-    public ShiroFilteRulesProvider getShiroFilteRulesProvider() {
-        return shiroFilteRulesProvider;
-    }
-
-    public Map<String, Filter> getFilters() {
-        return filters;
-    }
 }

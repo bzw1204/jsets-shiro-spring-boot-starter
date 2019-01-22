@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@SuppressWarnings("all")
+@SuppressWarnings(value = "unchecked")
 public class MapCacheManager implements CacheManager {
 
 
@@ -42,7 +42,7 @@ public class MapCacheManager implements CacheManager {
     public <K, V> Cache<K, V> getCache(String cacheName) throws CacheException {
         Cache<K, V> cache = CACHES.get(cacheName);
         if (null == cache) {
-            cache = new MapCache<K, V>(cacheName);
+            cache = new MapCache<>(cacheName);
             CACHES.put(cacheName, cache);
         }
         return cache;
@@ -56,7 +56,7 @@ public class MapCacheManager implements CacheManager {
      */
     public static class MapCache<K, V> implements Cache<K, V> {
 
-        private final ConcurrentMap<K, V> storge = new ConcurrentHashMap<K, V>();
+        private final ConcurrentMap<K, V> storage = new ConcurrentHashMap<K, V>();
         private final String cacheName;
 
         public MapCache(String cacheName) {
@@ -65,37 +65,37 @@ public class MapCacheManager implements CacheManager {
 
         @Override
         public void clear() throws CacheException {
-            storge.clear();
+            storage.clear();
         }
 
         @Override
         public V get(K key) throws CacheException {
-            return storge.get(key);
+            return storage.get(key);
         }
 
         @Override
         public Set<K> keys() {
-            return storge.keySet();
+            return storage.keySet();
         }
 
         @Override
         public V put(K key, V value) throws CacheException {
-            return storge.put(key, value);
+            return storage.put(key, value);
         }
 
         @Override
         public V remove(K key) throws CacheException {
-            return storge.remove(key);
+            return storage.remove(key);
         }
 
         @Override
         public int size() {
-            return storge.size();
+            return storage.size();
         }
 
         @Override
         public Collection<V> values() {
-            return storge.values();
+            return storage.values();
         }
 
         @Override

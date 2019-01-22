@@ -29,14 +29,14 @@ public interface Account extends Serializable {
     /**
      * 获取用户名
      *
-     * @return
+     * @return 用户名称
      */
     String getAccount();
 
     /**
      * 获取登陆口令
      *
-     * @return
+     * @return 用户密码
      */
     String getPassword();
 }

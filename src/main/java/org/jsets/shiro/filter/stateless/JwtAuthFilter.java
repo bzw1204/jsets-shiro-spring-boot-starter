@@ -31,6 +31,8 @@ import org.jsets.shiro.util.AbstractCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_UNAUTHORIZED;
+
 /**
  * 基于JWT(JSON WEB TOKEN)的无状态过滤器--认证
  *
@@ -43,11 +45,7 @@ public class JwtAuthFilter extends AbstractStatelessFilter {
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        if (null != getSubject(request, response)
-                && getSubject(request, response).isAuthenticated()) {
-            return true;
-        }
-        return false;
+        return null != getSubject(request, response) && getSubject(request, response).isAuthenticated();
     }
 
     @Override
@@ -57,13 +55,13 @@ public class JwtAuthFilter extends AbstractStatelessFilter {
             try {
                 Subject subject = getSubject(request, response);
                 subject.login(token);
-                return true;
+                return Boolean.TRUE;
             } catch (AuthenticationException e) {
                 LOGGER.error(request.getRemoteHost() + " JWT认证  " + e.getMessage());
                 AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
             }
         }
-        AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
-        return false;
+        AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, REST_MESSAGE_AUTH_UNAUTHORIZED);
+        return Boolean.FALSE;
     }
 }

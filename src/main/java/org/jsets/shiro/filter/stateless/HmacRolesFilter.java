@@ -57,7 +57,7 @@ public class HmacRolesFilter extends AbstractStatelessFilter {
                 AbstractCommons.restFailed(WebUtils.toHttp(response), HttpStatus.HTTP_UNAUTHORIZED, e.getMessage());
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
 }

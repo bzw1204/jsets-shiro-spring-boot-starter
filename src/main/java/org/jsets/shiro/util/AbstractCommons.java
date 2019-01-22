@@ -1,28 +1,9 @@
-/*
- * Copyright 2017-2018 the original author(https://github.com/wj596)
- *
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * </p>
- */
 package org.jsets.shiro.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import io.jsonwebtoken.CompressionCodec;
 import io.jsonwebtoken.CompressionCodecResolver;
 import io.jsonwebtoken.Header;
@@ -56,6 +37,7 @@ import static java.util.stream.Collectors.toSet;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
+@SuppressWarnings(value = "unchecked")
 public abstract class AbstractCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCommons.class);
@@ -238,7 +220,7 @@ public abstract class AbstractCommons {
         int delimiterCount = NumberConsts.ZERO;
         StringBuilder sb = new StringBuilder(128);
         for (char c : jwt.toCharArray()) {
-            if (c == '.') {
+            if (c == StrUtil.C_DOT) {
                 CharSequence tokenSeq = io.jsonwebtoken.lang.Strings.clean(sb);
                 String token = tokenSeq != null ? tokenSeq.toString() : null;
 

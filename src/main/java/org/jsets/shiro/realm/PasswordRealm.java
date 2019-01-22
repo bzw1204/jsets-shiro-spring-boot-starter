@@ -84,9 +84,9 @@ public class PasswordRealm extends AuthorizingRealm {
     /**
      * 构建授权对象
      *
-     * @param roles
-     * @param permissions
-     * @return
+     * @param roles       角色
+     * @param permissions 权限
+     * @return AuthorizationInfo
      */
     public static AuthorizationInfo buildAuthorizationInfo(Set<String> roles, Set<String> permissions) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();

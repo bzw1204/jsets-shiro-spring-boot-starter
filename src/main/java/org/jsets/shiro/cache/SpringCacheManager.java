@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@SuppressWarnings("all")
+@SuppressWarnings(value = "unchecked")
 public class SpringCacheManager implements CacheManager {
 
     private final org.springframework.cache.CacheManager delegator;

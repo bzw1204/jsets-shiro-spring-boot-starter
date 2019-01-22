@@ -88,7 +88,8 @@ public class ShiroProperties {
             , "/js/**"
             , "/images/**"
             , "/webjars/**"
-            , "/jcaptcha.jpg");
+            , "/jcaptcha.jpg"
+    );
 
     private boolean jcaptchaEnable = Boolean.FALSE; // 是否启用验证码
     private boolean keepOneEnabled = Boolean.FALSE; // 是否启用账号唯一用户登陆

@@ -74,7 +74,7 @@ public class HmacRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String payload = (String) principals.getPrimaryPrincipal();
 
-        boolean isHmac = payload.startsWith(HMAC) && StrUtil.DELIM_START.equals(payload.charAt(NumberConsts.FIVE)) && StrUtil.DELIM_END.equals(payload.charAt(payload.length() - 1));
+        boolean isHmac = payload.startsWith(HMAC) && StrUtil.C_DELIM_START == payload.charAt(NumberConsts.FIVE) && StrUtil.C_DELIM_END == payload.charAt(payload.length() - 1);
         if (isHmac) {
             String appId = payload.substring(6, payload.length() - 1);
             Set<String> roles = this.accountProvider.loadRoles(appId);

@@ -35,7 +35,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@SuppressWarnings("all")
+@SuppressWarnings(value = "unchecked")
 public class RedisCacheManager implements CacheManager{
 
 	private RedisTemplate redisTemplate;

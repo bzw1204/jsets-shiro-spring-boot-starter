@@ -141,7 +141,7 @@ public class RealmManager {
     /**
      * 获取所有Realms
      *
-     * @return
+     * @return Realm集合
      */
     public List<Realm> getAllRealms() {
         List<Realm> realms = Lists.newLinkedList();

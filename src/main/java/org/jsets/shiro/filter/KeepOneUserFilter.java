@@ -34,10 +34,7 @@ public class KeepOneUserFilter extends AbstractAccessControlFilter {
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
-        if (!this.properties.isKeepOneEnabled()) {
-            return true;
-        }
-        return false;
+        return !this.properties.isKeepOneEnabled();
     }
 
     @Override

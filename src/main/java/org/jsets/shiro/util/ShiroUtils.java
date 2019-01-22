@@ -209,7 +209,7 @@ public class ShiroUtils {
     }
 
     /**
-     * 获取当前Ssssion
+     * 获取当前Session
      */
     public static Session getSession() {
         return SecurityUtils.getSubject().getSession();

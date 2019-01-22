@@ -26,12 +26,12 @@ import lombok.Setter;
  * @author wangjie (https://github.com/wj596)
  * @date 2016年6月31日
  */
-@Getter
-@Setter
 public class JwtToken extends AbstractStatelessToken {
 
     private static final long serialVersionUID = 1832943548774576547L;
 
+    @Getter
+    @Setter
     private String jwt;
 
     public JwtToken(String host, String jwt) {

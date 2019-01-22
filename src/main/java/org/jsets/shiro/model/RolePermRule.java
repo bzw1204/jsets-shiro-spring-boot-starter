@@ -58,24 +58,24 @@ public class RolePermRule extends AbstractAuthorizeRule {
         StringBuilder sb = new StringBuilder();
         if (AbstractAuthorizeRule.RULE_TYPE_DEF == this.getType()) {
             if (!Strings.isNullOrEmpty(this.getNeedRoles())) {
-                sb.append(AbstractCommons.FILTER_ROLES + StrUtil.BRACKET_START + this.getNeedRoles() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_ROLES + StrUtil.BRACKET_START).append(this.getNeedRoles()).append(StrUtil.BRACKET_END);
             }
             if (!Strings.isNullOrEmpty(this.getNeedPerms())) {
                 if (sb.length() > 0) {
                     sb.append(StrUtil.COMMA);
                 }
-                sb.append(AbstractCommons.FILTER_PERMS + StrUtil.BRACKET_START + this.getNeedPerms() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_PERMS + StrUtil.BRACKET_START).append(this.getNeedPerms()).append(StrUtil.BRACKET_END);
             }
         }
         if (AbstractAuthorizeRule.RULE_TYPE_HMAC == this.getType()) {
             if (!Strings.isNullOrEmpty(this.getNeedRoles())) {
-                sb.append(AbstractCommons.FILTER_HMAC_ROLES + StrUtil.BRACKET_START + this.getNeedRoles() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_HMAC_ROLES + StrUtil.BRACKET_START).append(this.getNeedRoles()).append(StrUtil.BRACKET_END);
             }
             if (!Strings.isNullOrEmpty(this.getNeedPerms())) {
                 if (sb.length() > 0) {
                     sb.append(StrUtil.COMMA);
                 }
-                sb.append(AbstractCommons.FILTER_HMAC_PERMS + StrUtil.BRACKET_START + this.getNeedPerms() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_HMAC_PERMS + StrUtil.BRACKET_START).append(this.getNeedPerms()).append(StrUtil.BRACKET_END);
             }
             if (sb.length() == 0) {
                 sb.append(AbstractCommons.FILTER_HMAC);
@@ -83,13 +83,13 @@ public class RolePermRule extends AbstractAuthorizeRule {
         }
         if (AbstractAuthorizeRule.RULE_TYPE_JWT == this.getType()) {
             if (!Strings.isNullOrEmpty(this.getNeedRoles())) {
-                sb.append(AbstractCommons.FILTER_JWT_ROLES + StrUtil.BRACKET_START + this.getNeedRoles() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_JWT_ROLES + StrUtil.BRACKET_START).append(this.getNeedRoles()).append(StrUtil.BRACKET_END);
             }
             if (!Strings.isNullOrEmpty(this.getNeedPerms())) {
                 if (sb.length() > 0) {
                     sb.append(StrUtil.COMMA);
                 }
-                sb.append(AbstractCommons.FILTER_JWT_ROLES + StrUtil.BRACKET_START + this.getNeedPerms() + StrUtil.BRACKET_END);
+                sb.append(AbstractCommons.FILTER_JWT_ROLES + StrUtil.BRACKET_START).append(this.getNeedPerms()).append(StrUtil.BRACKET_END);
             }
             if (sb.length() == 0) {
                 sb.append(AbstractCommons.FILTER_JWT);

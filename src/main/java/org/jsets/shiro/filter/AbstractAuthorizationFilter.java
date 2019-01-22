@@ -13,6 +13,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_FORBIDDEN;
+import static org.jsets.shiro.consts.MessageConsts.REST_MESSAGE_AUTH_UNAUTHORIZED;
+
 /**
  * @author: 白振伟
  * @create: 2018年12月17日 19:58:22
@@ -30,7 +33,7 @@ public abstract class AbstractAuthorizationFilter extends AuthorizationFilter {
                 AbstractCommons.ajaxFailed(WebUtils.toHttp(response)
                         , HttpServletResponse.SC_UNAUTHORIZED
                         , HttpStatus.HTTP_UNAUTHORIZED
-                        , MessageConfig.REST_MESSAGE_AUTH_UNAUTHORIZED);
+                        , REST_MESSAGE_AUTH_UNAUTHORIZED);
             }
             saveRequestAndRedirectToLogin(request, response);
             //未授权
@@ -39,7 +42,7 @@ public abstract class AbstractAuthorizationFilter extends AuthorizationFilter {
                 AbstractCommons.ajaxFailed(WebUtils.toHttp(response)
                         , HttpServletResponse.SC_FORBIDDEN
                         , HttpStatus.HTTP_UNAUTHORIZED
-                        , MessageConfig.REST_MESSAGE_AUTH_FORBIDDEN);
+                        , REST_MESSAGE_AUTH_FORBIDDEN);
             } else {
                 String unauthorizedUrl = getUnauthorizedUrl();
                 if (StringUtils.hasText(unauthorizedUrl)) {
@@ -49,7 +52,7 @@ public abstract class AbstractAuthorizationFilter extends AuthorizationFilter {
                 }
             }
         }
-        return false;
+        return Boolean.FALSE;
     }
 
 }
